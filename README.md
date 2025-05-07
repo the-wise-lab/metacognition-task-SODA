@@ -14,7 +14,7 @@ The task differs from the original in that we ask only for global confidence rat
 
 ## Running the task
 
-You can access the landing page [here](https://the-wise-lab.github.io/metacognition-task-SODA/).
+You can access the landing page [here](https://the-wise-lab.github.io/metacognition-task-SODA/landing.html).
 
 This landing page allows you to set the following URL parameters before starting the experiment:
 
