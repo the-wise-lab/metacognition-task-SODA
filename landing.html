@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Experiment Setup</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <h1 class="text-2xl font-bold mb-6 text-center">Experiment Setup</h1>
+        <form id="setupForm">
+            <div class="mb-4">
+                <label for="subjectID" class="block text-sm font-medium text-gray-700">Subject ID:</label>
+                <input type="text" id="subjectID" name="subjectID" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            </div>
+
+            <div class="mb-4">
+                <label for="sessionID" class="block text-sm font-medium text-gray-700">Session ID:</label>
+                <select id="sessionID" name="sessionID" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700">Options:</label>
+                <div class="mt-2 space-y-2">
+                    <div class="flex items-center">
+                        <input id="test_mode" name="test_mode" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                        <label for="test_mode" class="ml-2 block text-sm text-gray-900">Enable Test Mode</label>
+                    </div>
+                    <div class="flex items-center">
+                        <input id="skip_instructions" name="skip_instructions" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                        <label for="skip_instructions" class="ml-2 block text-sm text-gray-900">Skip Instructions</label>
+                    </div>
+                    <div class="flex items-center">
+                        <input id="skip_practice" name="skip_practice" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                        <label for="skip_practice" class="ml-2 block text-sm text-gray-900">Skip Practice Trials</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700">Server Configuration:</label>
+                <div class="mt-2 space-y-2">
+                    <div>
+                        <label for="apiURL" class="block text-xs font-medium text-gray-700">API URL:</label>
+                        <input type="text" id="apiURL" name="apiURL" value="127.0.0.1" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="apiPort" class="block text-xs font-medium text-gray-700">API Port:</label>
+                        <input type="number" id="apiPort" name="apiPort" value="5000" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="apiEndpoint" class="block text-xs font-medium text-gray-700">API Endpoint:</label>
+                        <input type="text" id="apiEndpoint" name="apiEndpoint" value="/submit_data" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                Start Experiment
+            </button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('setupForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const subjectID = document.getElementById('subjectID').value;
+            const sessionID = document.getElementById('sessionID').value;
+            const testMode = document.getElementById('test_mode').checked;
+            const skipInstructions = document.getElementById('skip_instructions').checked;
+            const skipPractice = document.getElementById('skip_practice').checked;
+            const apiURL = document.getElementById('apiURL').value;
+            const apiPort = document.getElementById('apiPort').value;
+            const apiEndpoint = document.getElementById('apiEndpoint').value;
+
+            if (!subjectID) {
+                alert('Please enter a Subject ID.');
+                return; // Stop the function if subjectID is empty
+            }
+
+            const params = new URLSearchParams();
+            if (subjectID) {
+                params.append('subjectID', subjectID);
+            }
+            if (sessionID) {
+                params.append('sessionID', sessionID);
+            }
+            if (testMode) {
+                params.append('test_mode', 'true');
+            }
+            if (skipInstructions) {
+                params.append('skip_instructions', 'true');
+            }
+            if (skipPractice) {
+                params.append('skip_practice', 'true');
+            }
+            if (apiURL) {
+                params.append('apiURL', apiURL);
+            }
+            if (apiPort) {
+                params.append('apiPort', apiPort);
+            }
+            if (apiEndpoint) {
+                params.append('apiEndpoint', apiEndpoint);
+            }
+
+            // Redirect to index.html with the constructed query parameters
+            window.location.href = 'index.html?' + params.toString();
+        });
+    </script>
+</body>
+</html>

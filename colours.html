@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Color Pair Preview</title>
+    <style>
+        .pair {
+            display: flex;
+            margin: 8px 0;
+        }
+        .color-box {
+            width: 100px;
+            height: 50px;
+            margin-right: 8px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div id="colorContainer"></div>
+
+    <script>
+        const colors = [
+            ['#7AC600', '#0E55A8'],
+            ['#c4c700', '#780eaa'], 
+            ['#0021c7', '#6baa0e'],
+            ['#0085c7', '#aa0e0e'],
+            ['#00c7b0', '#aa0e88'],
+            ['#1a9cff', '#fea62a'],
+            ['#b42afe', '#1affd9'], 
+            ['#432afe', '#ffd91a'], 
+            ['#fe2a90', '#4bff1a'],
+            ['#2afe9b', '#ff881a'], 
+            ['#f0ff1a', '#fe2aa6'],
+            ['#00ad1d', '#9800a3']
+        ].sort(() => Math.random() - 0.5);
+
+        const container = document.getElementById('colorContainer');
+
+        colors.forEach((pair, index) => {
+            const row = document.createElement('div');
+            row.className = 'pair';
+
+            pair.forEach(color => {
+                const box = document.createElement('div');
+                box.className = 'color-box';
+                box.style.backgroundColor = color;
+                row.appendChild(box);
+            });
+
+            const label = document.createElement('div');
+            label.textContent = `${pair[0]} + ${pair[1]}`;
+            label.style.marginLeft = '10px';
+            row.appendChild(label);
+
+            container.appendChild(row);
+        });
+    </script>
+</body>
+</html>

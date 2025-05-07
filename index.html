@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metacognition Task</title>
+    
+    <!-- JSPsych core -->
+    <script src="https://unpkg.com/jspsych@7.3.4"></script>
+    <link href="https://unpkg.com/jspsych@7.3.4/css/jspsych.css" rel="stylesheet" type="text/css" />
+    
+    <!-- JSPsych plugins -->
+    <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.2"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.1.2"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-slider-response@1.1.2"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-instructions@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-preload@1.1.2"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-canvas-keyboard-response@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-call-function@1.1.3"></script>
+    
+    <!-- Google Font: Roboto -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        // Override the default 'sans' font family
+                        sans: ['Roboto', 'sans-serif'], 
+                    },
+                },
+            },
+        }
+    </script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="src/css/custom.css">
+    
+    <!-- JavaScript components -->
+    <script src="src/js/config.js" type="module"></script>
+    <script src="src/js/utils.js" type="module"></script>
+    <script src="src/js/components/instructions.js" type="module"></script>
+    <script src="src/js/components/trial.js" type="module"></script>
+    <script src="src/js/components/feedback.js" type="module"></script>
+    <script src="src/js/components/confidence-rating.js" type="module"></script>
+    <script src="src/js/components/task-choice.js" type="module"></script>
+    <script src="src/js/components/performance-rating.js" type="module"></script>
+    <script src="src/js/server-utils.js" type="module"></script>
+    <script src="src/js/main.js" type="module" defer></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div id="jspsych-target" class="max-w-screen-lg mx-auto"></div>
+</body>
+</html>

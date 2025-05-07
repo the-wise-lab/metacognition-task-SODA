@@ -1,0 +1,131 @@
+body {
+    /* Use Tailwind utility class in HTML instead */
+    @apply bg-gray-100 text-gray-800; 
+}
+
+/* Remove the jsPsych override */
+/* .jspsych-display-element { */
+/*    font-family: 'Roboto', sans-serif !important; */
+/* } */
+
+h1, h2, h3, h4 {
+    @apply font-bold mb-2;
+}
+
+button {
+    @apply bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600;
+}
+
+slider {
+    @apply w-full h-2 bg-gray-300 rounded;
+}
+
+.slider-thumb {
+    @apply w-4 h-4 bg-blue-500 rounded-full;
+}
+
+.feedback {
+    @apply text-lg font-medium mb-4;
+}
+
+.instructions {
+    @apply p-4 bg-white rounded shadow-md;
+}
+
+.task-choice {
+    @apply flex justify-center items-center space-x-4;
+}
+
+.rating-scale {
+    @apply flex justify-between mt-4;
+}
+
+.break {
+    @apply my-4 p-2 bg-yellow-200 text-yellow-800 rounded;
+}
+
+/* Task-specific CSS styles */
+
+/* Fixation cross */
+.fixation {
+    font-size: 36px;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+}
+
+/* Rating scale tick marks */
+.tick-marks {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+}
+
+.tick-mark {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Custom slider styling */
+input[type=range] {
+    height: 25px;
+    -webkit-appearance: none;
+    margin: 10px 0;
+    width: 100%;
+    /* Add background for track for better click detection */
+    background: #e5e7eb; 
+    border-radius: 5px;
+}
+
+input[type=range]:focus {
+    outline: none;
+}
+
+/* Hide thumb by default */
+input[type=range]::-webkit-slider-thumb {
+    box-shadow: 1px 1px 3px #000000;
+    border: 1px solid #000000;
+    height: 18px;
+    width: 18px;
+    border-radius: 25px;
+    background: transparent;
+    cursor: pointer;
+    -webkit-appearance: none;
+    margin-top: -4px;
+    border-color: transparent;
+    box-shadow: none;
+}
+
+input[type=range]::-moz-range-thumb {
+    box-shadow: 1px 1px 3px #000000;
+    border: 1px solid #000000;
+    height: 18px;
+    width: 18px;
+    border-radius: 25px;
+    background: transparent;
+    cursor: pointer;
+    border-color: transparent;
+    box-shadow: none;
+}
+
+/* Show thumb when .thumb-visible class is added */
+input[type=range].thumb-visible::-webkit-slider-thumb {
+    background: #3b82f6;
+    border-color: #000000;
+    box-shadow: 1px 1px 3px #000000;
+}
+
+input[type=range].thumb-visible::-moz-range-thumb {
+    background: #3b82f6;
+    border-color: #000000;
+    box-shadow: 1px 1px 3px #000000;
+}
+
+/* Ensure canvas is centered */
+canvas {
+    display: block;
+    margin: 0 auto;
+}
