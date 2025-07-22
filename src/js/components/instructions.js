@@ -173,9 +173,9 @@ function createInstructions() {
                 } = stimulusElements;
 
                 // Generate dot coordinates for the example
-                // Using CONFIG values for consistency, e.g., easy difference for a clear example
+                // Using CONFIG values for consistency, use staircase initial value for example
                 const baseDots = CONFIG.task.baseDotsPerBox;
-                const leftBoxDots = baseDots + CONFIG.task.easyDotDifference;
+                const leftBoxDots = baseDots + CONFIG.task.staircase.initialValue;
                 const rightBoxDots = baseDots;
 
                 const leftDotCoords = generateDotCoordinates(

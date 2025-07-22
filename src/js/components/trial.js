@@ -3,6 +3,7 @@
 import CONFIG from '../config.js';
 import { generateDotCoordinates, drawDots, jitterTime, hexToRgba } from '../utils.js';
 import { createConfidenceRating } from './confidence-rating.js'; // Import confidence rating
+import { getCurrentDotDifference, updateStaircase, getTrialStaircaseData } from '../staircase.js'; // Import staircase utilities
 
 /**
  * Helper function to draw a rounded rectangle with a border on canvas
@@ -47,9 +48,18 @@ function createDotTrial(taskParams) {
         blockNum        // Current block number
     } = taskParams;
     
-    // Determine number of dots based on difficulty
+    // Determine number of dots based on difficulty using staircase
     const baseDotsPerBox = CONFIG.task.baseDotsPerBox;
-    const dotDifference = isEasy ? CONFIG.task.easyDotDifference : CONFIG.task.difficultDotDifference;
+    let dotDifference;
+    
+    // Get current dot difference from staircase (or use initial value for practice)
+    if (isPractice) {
+        // For practice trials, use the initial staircase value
+        dotDifference = CONFIG.task.staircase.initialValue;
+    } else {
+        // For main trials, get current value from staircase
+        dotDifference = getCurrentDotDifference(isEasy);
+    }
     
     // Set stimulus duration based on whether this is practice
     const stimDuration = isPractice ? 
@@ -158,7 +168,10 @@ function createDotTrial(taskParams) {
             is_easy: isEasy,
             has_feedback: hasFeedback,
             more_side: moreSide,
-            is_practice: isPractice
+            is_practice: isPractice,
+            dot_difference: dotDifference, // Log the actual dot difference used
+            // Add staircase data (will be null for practice trials)
+            ...(isPractice ? {} : getTrialStaircaseData(isEasy))
             // Note: No response data here
         }
     };
@@ -205,6 +218,16 @@ function createDotTrial(taskParams) {
                 const responseKey = data.response === CONFIG.task.responseKeys.left ? 0 : 1;
                 data.response_side = responseKey;
                 data.correct = responseKey === moreSide ? 1 : 0; // Compare response to the known 'moreSide'
+                
+                // Update staircase if this is not a practice trial
+                if (!isPractice) {
+                    const newDotDifference = updateStaircase(isEasy, data.correct === 1);
+                    data.new_dot_difference = newDotDifference;
+                    
+                    // Log updated staircase data
+                    const staircaseData = getTrialStaircaseData(isEasy);
+                    Object.assign(data, staircaseData);
+                }
             } else {
                 // Should not happen with trial_duration: null and response_ends_trial: true, but good practice
                 data.response_side = null;

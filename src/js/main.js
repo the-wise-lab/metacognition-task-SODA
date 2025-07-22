@@ -8,6 +8,7 @@ import {
     seededRandom // Import seededRandom
 } from './utils.js';
 import { saveDataToServer } from './server-utils.js'; // Import saveDataToServer
+import { initializeStaircases, getStaircaseSummary } from './staircase.js'; // Import staircase utilities
 import { createDotTrial } from './components/trial.js';
 import { createConfidenceRating } from './components/confidence-rating.js';
 import { createTaskChoice } from './components/task-choice.js';
@@ -144,6 +145,9 @@ const timeline = [];
 
 validateAndPush(timeline, preload, "Preload");
 
+// Initialize staircases early so they're ready for practice trials
+initializeStaircases(CONFIG.task);
+
 // Add instructions (unless skip_instructions is present in URL)
 if (!skipInstructions) {
     validateAndPush(timeline, createInstructions(), "Instructions");
@@ -153,22 +157,26 @@ if (!skipInstructions) {
 if (!skipInstructions && !skipPractice) {
     validateAndPush(timeline, createPracticeInstructions(), "Practice Instructions");
 
-    // Practice trials
-    const practiceTasks = [
-        { taskIndex: 0, taskColor: CONFIG.practiceTaskColors[0], isEasy: true, hasFeedback: true, isPractice: true },
-        { taskIndex: 1, taskColor: CONFIG.practiceTaskColors[1], isEasy: true, hasFeedback: false, isPractice: true }
-    ];
-
+    // Practice trials - alternate between easy and difficult, use both for staircase initialization
     for (let i = 0; i < CONFIG.task.practiceTrialsPerTask; i++) {
-        const taskIdx = i % 2;
-        const task = practiceTasks[taskIdx];
-        const moreSide = seededRandom() > 0.5 ? 0 : 1; // Use seededRandom
-        
-        const practiceTrial = createDotTrial({
-            ...task,
-            moreSide: moreSide
-        });
-        validateAndPush(timeline, practiceTrial, `Practice Trial ${i}`);
+        // Create practice trials for both easy and difficult conditions
+        for (let difficulty = 0; difficulty < 2; difficulty++) {
+            const isEasy = difficulty === 0;
+            const taskIdx = difficulty; // Use difficulty as task index for practice
+            const taskColor = CONFIG.practiceTaskColors[taskIdx];
+            const moreSide = seededRandom() > 0.5 ? 0 : 1; // Use seededRandom
+            
+            const practiceTrial = createDotTrial({
+                taskIndex: taskIdx,
+                taskColor: taskColor,
+                isEasy: isEasy,
+                hasFeedback: taskIdx === 0, // First task has feedback, second doesn't
+                moreSide: moreSide,
+                isPractice: true,
+                blockNum: 0 // Practice block number
+            });
+            validateAndPush(timeline, practiceTrial, `Practice Trial ${i * 2 + difficulty + 1}`);
+        }
     }
 
     validateAndPush(timeline, createLearningBlockInstructions(), "Learning Block Instructions");
@@ -391,10 +399,28 @@ for (let block = 0; block < numBlocksToRun; block++) {
 const finalFeedbackNode = {
     type: jsPsychHtmlButtonResponse, // Directly using the type
     stimulus: function() {
+        const allTrials = jsPsych.data.get().filter({trial_type: 'dot_response'});
+        const learningTrials = allTrials.filter({is_practice: false});
+        const correctTrials = learningTrials.filter({correct: 1}).count();
+        let totalAccuracy = 0;
+        if (learningTrials.count() > 0) {
+            totalAccuracy = correctTrials / learningTrials.count();
+        }
+        
+        // Get staircase summary for display
+        const staircaseSummary = getStaircaseSummary();
+        
         return `
             <div class="max-w-xl mx-auto">
                 <h2 class="text-2xl font-bold mb-4">Experiment Complete</h2>
-                <p>Thank you for participating in this experiment!</p>
+                <p class="mb-4">Thank you for participating in this experiment!</p>
+                <p class="mb-4">Your overall accuracy was ${Math.round(totalAccuracy * 100)}%</p>
+                ${!CONFIG.task.skipTestBlock ? `<p class="mb-4">You earned ${Math.round(totalAccuracy * 50)} bonus points!</p>` : ''}
+                <div class="text-sm text-gray-600 mt-6">
+                    <p class="mb-2">Staircase Summary:</p>
+                    <p class="mb-1">Easy condition: ${staircaseSummary.easy ? staircaseSummary.easy.totalTrials : 0} trials, ${staircaseSummary.easy ? Math.round(staircaseSummary.easy.currentAccuracy * 100) : 0}% accuracy</p>
+                    <p class="mb-2">Difficult condition: ${staircaseSummary.difficult ? staircaseSummary.difficult.totalTrials : 0} trials, ${staircaseSummary.difficult ? Math.round(staircaseSummary.difficult.currentAccuracy * 100) : 0}% accuracy</p>
+                </div>
             </div>
         `;
     },
@@ -419,6 +445,9 @@ const finalFeedbackNode = {
         } else {
             data.bonus_points = 0;
         }
+        
+        // Add staircase summary to final data
+        data.staircase_summary = getStaircaseSummary();
     }
 };
 validateAndPush(timeline, finalFeedbackNode, "Final Feedback");

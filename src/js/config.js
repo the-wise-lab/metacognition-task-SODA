@@ -23,8 +23,25 @@ const CONFIG = {
         
         // Dot parameters
         baseDotsPerBox: 313, // half-filled box (out of 625 positions)
-        difficultDotDifference: 24, // +24 dots (target ~70% accuracy)
-        easyDotDifference: 58,    // +58 dots (target ~85% accuracy)
+        
+        // Staircase parameters
+        staircase: {
+            initialValue: 100,    // Starting dot difference
+            stepSize: 10,         // Amount to change on each adjustment
+            minValue: 20,         // Minimum dot difference
+            maxValue: 200,        // Maximum dot difference
+            logging: true,        // Enable/disable console logging of staircase updates
+            easy: {
+                targetCorrectRate: 0.85,  // Target 85% accuracy
+                nUp: 1,                   // 1 correct to decrease difficulty
+                nDown: 4                  // 4 incorrect to increase difficulty (1 up 4 down)
+            },
+            difficult: {
+                targetCorrectRate: 0.71,  // Target 71% accuracy
+                nUp: 1,                   // 1 correct to decrease difficulty
+                nDown: 2                  // 2 incorrect to increase difficulty (1 up 2 down)
+            }
+        },
         gridSize: 25, // 25x25 grid = 625 positions
         boxWidthPercent: 0.3, // Percentage of canvas width for each box (adjust for size)
         boxGapPercent: 0.2, // Percentage of canvas width for the gap between boxes
