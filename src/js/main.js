@@ -132,8 +132,16 @@ function validateAndPush(timelineArray, trialObject, trialName = "Unnamed Trial"
     timelineArray.push(trialObject);
 }
 
+
 // Main timeline
 const timeline = [];
+
+// Fullscreen mode at the start of the experiment
+timeline.push({
+  type: jsPsychFullscreen,
+  fullscreen_mode: true
+});
+
 validateAndPush(timeline, preload, "Preload");
 
 // Add instructions (unless skip_instructions is present in URL)
