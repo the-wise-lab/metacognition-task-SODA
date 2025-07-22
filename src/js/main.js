@@ -137,10 +137,10 @@ function validateAndPush(timelineArray, trialObject, trialName = "Unnamed Trial"
 const timeline = [];
 
 // Fullscreen mode at the start of the experiment
-timeline.push({
-  type: jsPsychFullscreen,
-  fullscreen_mode: true
-});
+// timeline.push({
+//   type: jsPsychFullscreen,
+//   fullscreen_mode: true
+// });
 
 validateAndPush(timeline, preload, "Preload");
 
@@ -207,8 +207,8 @@ for (let block = 0; block < numBlocksToRun; block++) {
         difficulty2 = 'easy';
     }
 
-    const feedback1 = seededRandom() < 0.5; // Use seededRandom
-    const feedback2 = seededRandom() < 0.5; // Use seededRandom
+    const feedback1 = true; // Use seededRandom
+    const feedback2 = true; // Use seededRandom
 
     const taskPairing = [
         { difficulty: difficulty1, feedback: feedback1 },
@@ -288,8 +288,8 @@ for (let block = 0; block < numBlocksToRun; block++) {
         type: jsPsychHtmlButtonResponse, // Directly using the type we know blockFeedback will use
         stimulus: function() {
             return `
-                <div class="max-w-xl mx-auto">
-                    <h2 class="text-2xl font-bold mb-4">Block ${blockNum} Complete</h2>
+                <div class="max-w-4xl text-2xl mx-auto">
+                    <h2 class="text-4xl font-bold mb-4">Block ${blockNum} Complete</h2>
                     
                     <p class="mb-3">You have completed ${blockNum} of ${numBlocksToRun} blocks.</p>
                 </div>

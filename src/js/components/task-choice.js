@@ -13,8 +13,8 @@ function createTaskChoice(taskColors, taskTypes, blockNum) {
         type: jsPsychHtmlKeyboardResponse,
         stimulus: function() {
             return `
-                <div class="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
-                    <h2 class="text-2xl text-center mb-6">Which task would you like to perform in the test block?</h2>
+                <div class="max-w-4xl text-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
+                    <h2 class="text-4xl text-center mb-6">Which task would you like to perform in the test block?</h2>
                     
                     <p class="mb-4 text-center">Choose the task you think you performed better at to maximize your bonus points.</p>
                     

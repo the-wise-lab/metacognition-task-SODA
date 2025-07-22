@@ -12,22 +12,22 @@ function createPerformanceRating(taskInfo) {
     return {
         type: jsPsychHtmlSliderResponse,
         stimulus: `
-            <div class="max-w-xl mx-auto">
-                <h3 class="text-xl mb-4 text-center">Please rate your overall performance on this task:</h3>
+            <div class="max-w-4xl text-2xl mx-auto">
+                <h3 class="text-4xl mb-4 text-center">Please rate your overall performance for this colour:</h3>
                 <div class="w-16 h-16 rounded-full mx-auto mb-4" style="background-color:${color};"></div>
-                <p class="text-sm text-center text-gray-600 mb-6">
+                <p class="text-2xl text-center text-gray-600 mb-6">
                     Rate how well you think you performed overall on this task, from 50% (chance level) to 100% (perfect).
                 </p>
             </div>
         `,
         labels: ['50% correct<br>(chance level)', '60%', '70%', '80%', '90%', '100% correct<br>(perfect)'],
-        slider_width: 500,
+        slider_width: 800,
         min: CONFIG.ratingScale.min,
         max: CONFIG.ratingScale.max,
         step: CONFIG.ratingScale.step,
         slider_start: CONFIG.ratingScale.min,
         require_movement: true,
-        button_label: 'Submit',
+        button_label: '<span class="text-2xl font-bold">Submit</span>',
         data: {
             trial_type: 'performance_rating',
             block_number: blockNum, // Added blockNum
@@ -38,6 +38,9 @@ function createPerformanceRating(taskInfo) {
         on_load: function() {
             const sliderElement = document.querySelector('#jspsych-html-slider-response-response'); // Get the slider input
             const sliderWrapper = document.querySelector('#jspsych-html-slider-response-wrapper'); // Wrapper div created by plugin
+
+            // Set text size for labels
+            sliderWrapper.style.fontSize = '1.5rem'; // Set font size for labels
 
             if (!sliderElement || !sliderWrapper) {
                 console.error("Slider elements not found for tick mark positioning.");

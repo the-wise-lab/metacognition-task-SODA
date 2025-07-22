@@ -26,7 +26,7 @@ const CONFIG = {
         difficultDotDifference: 24, // +24 dots (target ~70% accuracy)
         easyDotDifference: 58,    // +58 dots (target ~85% accuracy)
         gridSize: 25, // 25x25 grid = 625 positions
-        boxWidthPercent: 0.2, // Percentage of canvas width for each box (adjust for size)
+        boxWidthPercent: 0.3, // Percentage of canvas width for each box (adjust for size)
         boxGapPercent: 0.2, // Percentage of canvas width for the gap between boxes
         
         // Response keys

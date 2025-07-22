@@ -123,7 +123,7 @@ function createDotTrial(taskParams) {
     // Dot stimulus display (dots visible, no response)
     const dotDisplay = {
         type: jsPsychCanvasKeyboardResponse,
-        canvas_size: [400, 800],
+        canvas_size: [600, 1000],
         stimulus: function(c) {
             const ctx = c.getContext('2d');
             const canvasWidth = c.width;
@@ -142,7 +142,7 @@ function createDotTrial(taskParams) {
             const rightDotCoords = generateDotCoordinates(rightBoxDots, gridSize);
 
             // Draw dots
-            const dotRadius = 2;
+            const dotRadius = 3;
             drawDots(ctx, leftDotCoords, leftBoxX, boxY, boxWidth, boxHeight, gridSize, dotRadius);
             drawDots(ctx, rightDotCoords, rightBoxX, boxY, boxWidth, boxHeight, gridSize, dotRadius);
         },
@@ -166,7 +166,7 @@ function createDotTrial(taskParams) {
     // Response screen (empty boxes, waits for response)
     const responseScreen = {
         type: jsPsychCanvasKeyboardResponse,
-        canvas_size: [400, 800],
+        canvas_size: [600, 1000],
         stimulus: function(c) {
             const ctx = c.getContext('2d');
             const canvasWidth = c.width;
@@ -178,7 +178,7 @@ function createDotTrial(taskParams) {
 
             // Draw prompt text below the boxes on the canvas
             ctx.fillStyle = '#374151'; // Dark gray text
-            ctx.font = '16px sans-serif';
+            ctx.font = '24px sans-serif';
             ctx.textAlign = 'center';
             const promptText = `Which box had more dots? Press '${CONFIG.task.responseKeys.left}' for left, '${CONFIG.task.responseKeys.right}' for right.`;
             const textY = boxY + boxHeight + 50; // Position text 30px below the bottom of the boxes
@@ -216,7 +216,7 @@ function createDotTrial(taskParams) {
     // Highlight the chosen box (using canvas)
     const highlightResponse = {
         type: jsPsychCanvasKeyboardResponse, // Change type to canvas
-        canvas_size: [400, 800],
+        canvas_size: [600, 1000],
         stimulus: function(c) {
             const ctx = c.getContext('2d');
             const canvasWidth = c.width;
@@ -277,7 +277,7 @@ function createDotTrial(taskParams) {
     // Feedback display (or no feedback)
     const feedbackDisplay = {
         type: jsPsychHtmlKeyboardResponse,
-        stimulus: '<div id="feedback-stimulus-container"></div>', // Placeholder container
+        stimulus: '<div class="text-2xl" id="feedback-stimulus-container"></div>', // Placeholder container
         choices: "NO_KEYS",
         trial_duration: CONFIG.timing.feedbackDuration,
         data: {
@@ -311,11 +311,11 @@ function createDotTrial(taskParams) {
                 feedbackTextContent = correct ? "Correct" : "Incorrect";
             }
 
-            const containerClasses = "p-6 rounded-lg border-2 flex justify-center items-center min-w-[180px] mx-auto"; 
+            const containerClasses = "p-6 rounded-lg text-3xl border-2 flex justify-center items-center min-w-[180px] mx-auto"; 
             
             const htmlContent = `
                 <div class="${containerClasses}" style="background-color:${taskColor};">
-                    <p class="text-white text-center text-xl">${feedbackTextContent}</p>
+                    <p class="text-white text-center text-3xl font-bold">${feedbackTextContent}</p>
                 </div>`;
 
             const container = document.getElementById('feedback-stimulus-container');

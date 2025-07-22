@@ -12,8 +12,8 @@ function createBlockFeedback(blockData) {
     return {
         type: jsPsychHtmlButtonResponse,
         stimulus: `
-            <div class="max-w-xl mx-auto">
-                <h2 class="text-2xl font-bold mb-4">Block ${blockNumber} Complete</h2>
+            <div class="max-w-4xl text-2xl mx-auto">
+                <h2 class="text-4xl font-bold mb-4">Block ${blockNumber} Complete</h2>
                 
                 <p class="mb-3">You have completed ${blockNumber} of ${totalBlocks} blocks.</p>
                 

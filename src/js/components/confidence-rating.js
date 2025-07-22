@@ -12,20 +12,20 @@ function createConfidenceRating(taskColor, blockNum) {
     return {
         type: jsPsychHtmlSliderResponse,
         stimulus: `
-            <div class="max-w-xl mx-auto mb-6">
-                <p class="text-lg mb-2">How confident are you that your response was correct?</p>
-                <p class="text-sm text-gray-600">Drag the slider to indicate your confidence</p>
-                <div class="w-4 h-4 rounded-full mx-auto mt-4 mb-2" style="background-color:${taskColor};"></div>
+            <div class="max-w-4xl text-2xl mx-auto mb-6">
+                <p class="text-4xl mb-6">How confident are you that your response was correct?</p>
+                <p class="text-2xl text-gray-600">Drag the slider to indicate your confidence</p>
+                <div class="w-8 h-8 rounded-full mx-auto mt-4 mb-2" style="background-color:${taskColor};"></div>
             </div>
         `,
         labels: ['50% correct<br>(chance level)', '60%', '70%', '80%', '90%', '100% correct<br>(perfect)'],
-        slider_width: 500,
+        slider_width: 800,
         min: CONFIG.ratingScale.min,
         max: CONFIG.ratingScale.max,
         step: CONFIG.ratingScale.step,
         slider_start: CONFIG.ratingScale.min,
         require_movement: true,
-        button_label: 'Submit',
+        button_label: '<span class="text-2xl font-bold">Submit</span>',
         data: {
             trial_type: 'confidence_rating',
             block_number: blockNum, // Added blockNum
@@ -35,6 +35,9 @@ function createConfidenceRating(taskColor, blockNum) {
             const sliderElement = document.querySelector('#jspsych-html-slider-response-response'); // Get the slider input
             const sliderWrapper = document.querySelector('#jspsych-html-slider-response-wrapper'); // Wrapper div created by plugin
 
+            // Set text size for labels
+            sliderWrapper.style.fontSize = '1.5rem'; // Set font size for labels
+
             if (!sliderElement || !sliderWrapper) {
                 console.error("Slider elements not found for tick mark positioning.");
                 return;
@@ -42,7 +45,7 @@ function createConfidenceRating(taskColor, blockNum) {
 
             // --- Create container for visual tick marks ---
             const visualTicksContainer = document.createElement('div');
-            const sliderWidth = sliderElement.offsetWidth || CONFIG.ratingScale.slider_width || 500; // Use actual or configured width
+            const sliderWidth = sliderElement.offsetWidth || CONFIG.ratingScale.slider_width || 800; // Use actual or configured width
             visualTicksContainer.style.position = 'relative'; // Relative positioning for children
             visualTicksContainer.style.width = `${sliderWidth}px`;
             visualTicksContainer.style.height = '10px'; // Height for tick lines

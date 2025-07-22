@@ -13,43 +13,43 @@ import {
 function createInstructions() {
     // Page 1: Welcome
     const page1_html = `
-        <div class="max-w-2xl mx-auto">
-            <h1 class="text-2xl font-bold mb-4">Welcome</h1>
-            <p class="mb-3">In this experiment, you will perform a series of trials where you'll judge which of two boxes contains more dots.</p>
-            <p class="mb-3">The boxes can be from either the <span style="color:${
-                CONFIG.practiceTaskColors[1] // Use second practice color
+        <div class="max-w-4xl mx-auto text-2xl">
+            <h1 class="text-5xl font-bold mb-6">Welcome</h1>
+            <p class="mb-6">In this experiment, you will perform a series of trials where you'll judge which of two boxes contains more dots.</p>
+            <p class="mb-6">The boxes can be from either the <span style="color:${
+                CONFIG.practiceTaskColors[1]
             };"><b>first</b></span> set or <span style="color:${
-        CONFIG.practiceTaskColors[0] // Use first practice color
+        CONFIG.practiceTaskColors[0]
     };"><b>second</b></span> set. The <span style="color:${
         CONFIG.practiceTaskColors[1]
     };"><b>first</b></span> and <span style="color:${
         CONFIG.practiceTaskColors[0]
     };"><b>second</b></span> sets differ in their difficulty.</p>
-    <p class="mb-3">Each set is identified by a different colour, and each trial will begin with a coloured circle telling you which set the boxes come from on that trial.</p>
-    <p class="mb-3">You will perform multiple blocks, each with different colours.</p>
+            <p class="mb-6">Each set is identified by a different colour, and each trial will begin with a coloured circle telling you which set the boxes come from on that trial.</p>
+            <p class="mb-6">You will perform multiple blocks, each with different colours.</p>
         </div>
     `;
 
     // Page 2: Task Instructions with Canvas (HTML only, script moved to on_load)
     const canvasInstructionPageHTML = `
-        <div class="max-w-2xl mx-auto">
-            <h1 class="text-2xl font-bold mb-4">Task Instructions</h1>
-            <p class="mb-3">You'll see two black boxes filled with white dots. Your job is to decide which box has <b>MORE</b> dots.</p>
-            <p class="mb-3">The boxes will appear briefly, so you'll need to pay close attention.</p>
-            <p class="mb-3">If you think the <b>LEFT</b> box has more dots, press the <b>'${CONFIG.task.responseKeys.left}'</b> key.</p>
-            <p class="mb-3">If you think the <b>RIGHT</b> box has more dots, press the <b>'${CONFIG.task.responseKeys.right}'</b> key.</p>
-            <p class="mb-3">The task is designed to be challening, so the correct answer may not always be obvious.</p>
+        <div class="max-w-4xl mx-auto text-2xl">
+            <h1 class="text-4xl font-bold mb-4">Task Instructions</h1>
+            <p class="mb-6">You'll see two black boxes filled with white dots. Your job is to decide which box has <b>MORE</b> dots.</p>
+            <p class="mb-6">The boxes will appear briefly, so you'll need to pay close attention.</p>
+            <p class="mb-6">If you think the <b>LEFT</b> box has more dots, press the <b>'${CONFIG.task.responseKeys.left}'</b> key.</p>
+            <p class="mb-6">If you think the <b>RIGHT</b> box has more dots, press the <b>'${CONFIG.task.responseKeys.right}'</b> key.</p>
+            <p class="mb-6">The task is designed to be challening, so the correct answer may not always be obvious.</p>
             <div class="flex justify-center my-4">
-                <canvas id="dotBoxExample" width="600" height="300" class="border"></canvas>
+                <canvas id="dotBoxExample" width="800" height="300" class="border"></canvas>
             </div>
-            <p class="text-sm text-center text-gray-600">Example of dot boxes (left box has more dots in this example)</p>
+            <p class="text-xl text-center text-gray-600">Example of dot boxes (left box has more dots in this example)</p>
         </div>
     `;
 
     // Define individual HTML for intermediate instruction pages
     const feedbackPageHTML = `
-        <div class="max-w-2xl mx-auto">
-            <h1 class="text-2xl font-bold mb-4">Feedback</h1>
+        <div class="max-w-4xl mx-auto text-2xl">
+            <h1 class="text-4xl font-bold mb-4">Feedback</h1>
             <p class="mb-3">After each response, you may receive feedback about whether your answer was correct or not.</p>
             <p class="mb-3">Some trials will provide feedback, showing "Correct" or "Incorrect" after the trial.</p>
             <p class="mb-3">Other trials will not provide any feedback, showing only a coloured rectangle with no text.</p>
@@ -58,20 +58,20 @@ function createInstructions() {
         `;
 
     const confidenceRatingsPageHTML = `
-        <div class="max-w-2xl mx-auto">
-            <h1 class="text-2xl font-bold mb-4">Confidence Ratings</h1>
+        <div class="max-w-4xl mx-auto text-2xl">
+            <h1 class="text-4xl font-bold mb-4">Confidence Ratings</h1>
             <p class="mb-3">After each trial, you'll be asked to rate how confident you are that your response was correct.</p>
             <p class="mb-3">Use the slider to indicate your confidence level, from 50% (chance level) to 100% (completely certain).</p>
             <p class="mb-3">Try to be as accurate as possible when rating your confidence.</p>
             <div class="my-4 p-4 border rounded bg-gray-50 flex justify-center">
-                <img src="assets/rating_scale_example.png" alt="Example of the rating scale" style="max-width: 500px; width: 100%; border: 1px solid #ccc;">
+                <img src="assets/rating_scale_example.png" alt="Example of the rating scale" style="max-width: 800px; width: 100%; border: 1px solid #ccc;">
             </div>
         </div>
         `;
 
     const learningAndTestBlocksPageHTML = `
-        <div class="max-w-2xl mx-auto">
-            <h1 class="text-2xl font-bold mb-4">Learning and Test Blocks</h1>
+        <div class="max-w-4xl mx-auto text-2xl">
+            <h1 class="text-4xl font-bold mb-4">Learning and Test Blocks</h1>
             <p class="mb-3">The experiment is organized into "learning blocks" and "test blocks".</p>
             <p class="mb-3">Each learning block contains 24 trials (12 from each of two tasks). The tasks are mixed together in random order.</p>
             <p class="mb-3">After each learning block, you'll choose which task you want to perform in a short test block.</p>
@@ -81,8 +81,8 @@ function createInstructions() {
         `;
 
     const taskChoiceAndPerformanceRatingsPageHTML = `
-        <div class="max-w-2xl mx-auto">
-            <h1 class="text-2xl font-bold mb-4">Task Choice and Performance Ratings</h1>
+        <div class="max-w-4xl mx-auto text-2xl">
+            <h1 class="text-4xl font-bold mb-4">Task Choice and Performance Ratings</h1>
             <p class="mb-3">After a learning block, you'll choose which task to continue with by pressing either:</p>
             <p class="mb-3 font-bold">The '${CONFIG.task.taskChoiceKeys.left}' key for the first task, or the '${CONFIG.task.taskChoiceKeys.right}' key for the second task.</p>
             <p class="mb-3">After the test block, you'll rate your overall performance on both tasks using a rating scale.</p>
@@ -91,8 +91,8 @@ function createInstructions() {
         `;
 
     const learningBlocksAndPerformanceRatingsPageHTML_SkipTest = `
-        <div class="max-w-2xl mx-auto">
-            <h1 class="text-2xl font-bold mb-4">Learning Blocks and Performance Ratings</h1>
+        <div class="max-w-4xl mx-auto text-2xl">
+            <h1 class="text-4xl font-bold mb-4">Learning Blocks and Performance Ratings</h1>
             <p class="mb-3">After 24 trials, you'll rate your overall performance on both tasks using a rating scale.</p>
             <p class="mb-3">These ratings help us understand how well you think you performed on each task.</p>
         </div>
@@ -116,8 +116,8 @@ function createInstructions() {
 
     // Page 7: Practice Trials intro
     const lastPageHTML = `
-        <div class="max-w-2xl mx-auto">
-            <h1 class="text-2xl font-bold mb-4">Practice Trials</h1>
+        <div class="max-w-4xl mx-auto text-2xl">
+            <h1 class="text-4xl font-bold mb-4">Practice Trials</h1>
             <p class="mb-3">Before we begin, you'll complete 10 practice trials to get familiar with the task.</p>
             <p class="mb-3">The practice will show you both types of tasks - with and without feedback.</p>
             <p class="mb-3">During practice, the dots will be shown for a little longer than in the real task.</p>
@@ -131,15 +131,16 @@ function createInstructions() {
         pages: [page1_html],
         show_clickable_nav: true,
         allow_backward: false,
-        button_label_next: "Next",
+        button_label_next: '<span class="text-2xl font-bold">Next</span>',
         data: { trial_type: "instructions_part1" },
+        
     };
 
     const canvas_instruction_trial = {
         type: jsPsychHtmlButtonResponse,
         stimulus: canvasInstructionPageHTML,
         choices: ["Next"],
-        button_html: '<button class="jspsych-btn">%choice%</button>',
+        button_html: '<button class="jspsych-btn text-2xl font-bold">%choice%</button>',
         on_load: function () {
             const canvas = document.getElementById("dotBoxExample");
             if (canvas) {
@@ -221,8 +222,8 @@ function createInstructions() {
         type: jsPsychInstructions,
         pages: intermediateInstructionPages,
         show_clickable_nav: true,
-        button_label_next: "Next",
-        button_label_previous: "Previous",
+        button_label_next: '<span class="text-2xl font-bold">Next</span>',
+        button_label_previous: '<span class="text-2xl font-bold">Previous</span>',
         data: { trial_type: "instructions_part2" },
     };
 
@@ -230,7 +231,7 @@ function createInstructions() {
         type: jsPsychHtmlButtonResponse,
         stimulus: lastPageHTML,
         choices: ["Begin Practice Trials"],
-        button_html: '<button class="jspsych-btn">%choice%</button>',
+        button_html: '<button class="jspsych-btn text-2xl font-bold">%choice%</button>',
         data: { trial_type: "instructions_final_page" },
     };
 
@@ -257,8 +258,8 @@ function createTestBlockInstructions(taskColor, taskType, blockNum) {
     return {
         type: jsPsychHtmlButtonResponse,
         stimulus: `
-            <div class="max-w-xl mx-auto">
-                <h2 class="text-2xl font-bold mb-4">Test Block</h2>
+            <div class="max-w-4xl mx-auto text-2xl">
+                <h2 class="text-4xl font-bold mb-4">Test Block</h2>
                 <p class="mb-3">You have chosen to perform the following task in the test block:</p>
                 <div class="flex items-center justify-center my-6">
                     <div class="w-16 h-16 rounded-full mr-4" style="background-color:${taskColor};"></div>
@@ -270,6 +271,7 @@ function createTestBlockInstructions(taskColor, taskType, blockNum) {
             </div>
         `,
         choices: ["Begin Test Block"],
+        button_html: '<button class="jspsych-btn text-2xl font-bold">%choice%</button>',
         data: {
             trial_type: "test_block_instructions",
             block_number: blockNum, // Added blockNum
@@ -289,15 +291,16 @@ function createBreakScreen(blockNumber, totalBlocks) {
     return {
         type: jsPsychHtmlButtonResponse,
         stimulus: `
-            <div class="max-w-xl mx-auto">
-                <h2 class="text-2xl font-bold mb-4">Take a Break</h2>
-                <p class="mb-3">You have completed block ${blockNumber} of ${totalBlocks}.</p>
-                <p class="mb-3">Feel free to take a short break before continuing.</p>
-                <p class="mb-3">The next block will feature two new tasks with different colors.</p>
-                <p class="mb-3">Remember to pay attention to how well you perform on each task.</p>
+            <div class="max-w-4xl mx-auto text-2xl">
+                <h2 class="text-4xl font-bold mb-4">Take a Break</h2>
+                <p class="mb-6">You have completed block ${blockNumber} of ${totalBlocks}.</p>
+                <p class="mb-6">Feel free to take a short break before continuing.</p>
+                <p class="mb-6">The next block will feature two new tasks with different colors.</p>
+                <p class="mb-6">Remember to pay attention to how well you perform on each task.</p>
             </div>
         `,
         choices: ["Continue to Next Block"],
+        button_html: '<button class="jspsych-btn text-2xl font-bold">%choice%</button>',
         data: {
             trial_type: "break_screen",
             block_number: blockNumber,
@@ -314,14 +317,15 @@ function createPracticeInstructions() {
     return {
         type: jsPsychHtmlButtonResponse,
         stimulus: `
-            <div class="max-w-xl mx-auto">
-                <h2 class="text-2xl font-bold mb-4">Practice Trials</h2>
+        <div class="max-w-4xl mx-auto text-2xl">
+                <h2 class="text-4xl font-bold mb-4">Practice Trials</h2>
                 <p class="mb-3">You will now complete 10 practice trials to familiarize yourself with the task.</p>
                 <p class="mb-3">Press the <b>'${CONFIG.task.responseKeys.left}'</b> key if the <b>LEFT</b> box has more dots.</p>
                 <p class="mb-3">Press the <b>'${CONFIG.task.responseKeys.right}'</b> key if the <b>RIGHT</b> box has more dots.</p>
             </div>
         `,
         choices: ["Begin Practice"],
+        button_html: '<button class="jspsych-btn text-2xl font-bold">%choice%</button>',
         data: {
             trial_type: "practice_instructions",
         },
@@ -363,6 +367,7 @@ function createLearningBlockInstructions() {
             </div>
         `,
         choices: ["Begin Experiment"],
+        button_html: '<button class="jspsych-btn text-2xl font-bold">%choice%</button>',
         data: {
             trial_type: "learning_block_instructions",
         },
