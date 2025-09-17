@@ -132,7 +132,7 @@ function createInstructions() {
     const lastPageHTML = `
         <div class="max-w-4xl mx-auto text-2xl">
             <h1 class="text-4xl font-bold mb-4">Practice Trials</h1>
-            <p class="mb-3">Before we begin, you'll complete a short practice o get familiar with the task.</p>
+            <p class="mb-3">Before we begin, you'll complete a short practice to get familiar with the task.</p>
             <p class="mb-3">During practice, the dots will be shown for a little longer than in the real task.</p>
             <p class="mb-3">After the practice, we'll begin the actual experiment.</p>
             <p class="mb-3 mt-6 text-center font-bold">Press the button below when you're ready to begin the practice trials.</p>
