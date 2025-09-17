@@ -16,7 +16,7 @@ function createPerformanceRating(taskInfo) {
                 <h3 class="text-4xl mb-4 text-center">Please rate your overall performance for this colour:</h3>
                 <div class="w-16 h-16 rounded-full mx-auto mb-4" style="background-color:${color};"></div>
                 <p class="text-2xl text-center text-gray-600 mb-6">
-                    Rate how well you think you performed overall on this task, from 50% (chance level) to 100% (perfect).
+                    How well do you think you performed on this colour, from 50% (chance level) to 100% (perfect)?
                 </p>
             </div>
         `,
