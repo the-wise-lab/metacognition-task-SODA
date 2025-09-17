@@ -432,7 +432,8 @@ function getTrialStaircaseData(isEasy) {
             entropy: questEntropy(quest),
             beta: quest.beta,
             lapse: quest.lapse,
-            guess: quest.guess
+            guess: quest.guess,
+            target_rate: isEasy ? CONFIG.task.staircase.easy.targetCorrectRate : CONFIG.task.staircase.difficult.targetCorrectRate
         };
     } else {
         const staircase = isEasy ? staircases.easy : staircases.difficult;
@@ -442,7 +443,9 @@ function getTrialStaircaseData(isEasy) {
                 dot_difference: null,
                 staircase_trials: 0,
                 staircase_accuracy: 0,
-                staircase_reversals: 0
+                staircase_reversals: 0,
+                staircase_method: 'classic',
+                target_rate: isEasy ? CONFIG.task.staircase.easy.targetCorrectRate : CONFIG.task.staircase.difficult.targetCorrectRate
             };
         }
         
@@ -454,7 +457,8 @@ function getTrialStaircaseData(isEasy) {
             staircase_accuracy: staircase.getCurrentAccuracy(),
             staircase_reversals: staircase.reversalPoints.length,
             consecutive_correct: staircase.consecutiveCorrect,
-            consecutive_incorrect: staircase.consecutiveIncorrect
+            consecutive_incorrect: staircase.consecutiveIncorrect,
+            target_rate: isEasy ? CONFIG.task.staircase.easy.targetCorrectRate : CONFIG.task.staircase.difficult.targetCorrectRate
         };
     }
 }
