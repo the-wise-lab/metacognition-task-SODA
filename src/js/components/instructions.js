@@ -15,34 +15,48 @@ function createInstructions() {
     const page1_html = `
         <div class="max-w-4xl mx-auto text-2xl">
             <h1 class="text-5xl font-bold mb-6">Welcome</h1>
-            <p class="mb-6">In this experiment, you will perform a series of trials where you'll judge which of two boxes contains more dots.</p>
-            <p class="mb-6">The boxes can be from either the <span style="color:${
-                CONFIG.practiceTaskColors[1]
-            };"><b>first</b></span> set or <span style="color:${
-        CONFIG.practiceTaskColors[0]
-    };"><b>second</b></span> set. The <span style="color:${
-        CONFIG.practiceTaskColors[1]
-    };"><b>first</b></span> and <span style="color:${
-        CONFIG.practiceTaskColors[0]
-    };"><b>second</b></span> sets differ in their difficulty.</p>
-            <p class="mb-6">Each set is identified by a different colour, and each trial will begin with a coloured circle telling you which set the boxes come from on that trial.</p>
-            <p class="mb-6">You will perform multiple blocks, each with different colours.</p>
-        </div>
+            <p class="mb-6">For this task, your goal is to determine which of two boxes contains more dots.</p>
     `;
+
 
     // Page 2: Task Instructions with Canvas (HTML only, script moved to on_load)
     const canvasInstructionPageHTML = `
         <div class="max-w-4xl mx-auto text-2xl">
             <h1 class="text-4xl font-bold mb-4">Task Instructions</h1>
             <p class="mb-6">You'll see two black boxes filled with white dots. Your job is to decide which box has <b>MORE</b> dots.</p>
-            <p class="mb-6">The boxes will appear briefly, so you'll need to pay close attention.</p>
             <p class="mb-6">If you think the <b>LEFT</b> box has more dots, press the <b>'${CONFIG.task.responseKeys.left}'</b> key.</p>
             <p class="mb-6">If you think the <b>RIGHT</b> box has more dots, press the <b>'${CONFIG.task.responseKeys.right}'</b> key.</p>
-            <p class="mb-6">The task is designed to be challening, so the correct answer may not always be obvious.</p>
             <div class="flex justify-center my-4">
                 <canvas id="dotBoxExample" width="800" height="300" class="border"></canvas>
             </div>
             <p class="text-xl text-center text-gray-600">Example of dot boxes (left box has more dots in this example)</p>
+        </div>
+    `;
+    
+    // Define individual HTML for intermediate instruction pages
+    const boxInstructionPage2 = `
+        <div class="max-w-4xl mx-auto text-2xl">
+            <p class="mb-3">The boxes will appear briefly, so you'll need to pay close attention.</p>
+            <p class="mb-3">The task is designed to be challenging, so the correct answer may not always be obvious.</p>
+        </div>
+        `;
+
+    const page2_html = `
+        <div class="max-w-4xl mx-auto text-2xl">
+            <p class="mb-6">Each pair of boxes has a colour associated with it.</p>
+            <p class="mb-6">For example, you might see boxes from <span style="color:${
+                CONFIG.practiceTaskColors[1]
+            };"><b>this</b></span> colour or <span style="color:${
+        CONFIG.practiceTaskColors[0]
+    };"><b>this</b></span> colour.</p>
+            <p class="mb-6">The colour will be shown before the boxes appear, and on the background behind the boxes.</p>
+        </div>
+    `;
+
+    const page3_html = `
+        <div class="max-w-4xl mx-auto text-2xl">
+            <p class="mb-6">One colour will be more difficult than the other.</p>
+            <p class="mb-6">This means that the two boxes will have similar numbers of dots.</p>
         </div>
     `;
 
@@ -50,9 +64,8 @@ function createInstructions() {
     const feedbackPageHTML = `
         <div class="max-w-4xl mx-auto text-2xl">
             <h1 class="text-4xl font-bold mb-4">Feedback</h1>
-            <p class="mb-3">After each response, you may receive feedback about whether your answer was correct or not.</p>
-            <p class="mb-3">Some trials will provide feedback, showing "Correct" or "Incorrect" after the trial.</p>
-            <p class="mb-3">Other trials will not provide any feedback, showing only a coloured rectangle with no text.</p>
+            <p class="mb-3">Sometimes you will be given feedback, where you will see "Correct" or "Incorrect" after the trial.</p>
+            <p class="mb-3">Other times you will not get feedback, and will see only a coloured rectangle with no text.</p>
             <p class="mb-3">Pay attention to how well you think you're performing in each task, even when you don't get feedback.</p>
         </div>
         `;
@@ -60,7 +73,7 @@ function createInstructions() {
     const confidenceRatingsPageHTML = `
         <div class="max-w-4xl mx-auto text-2xl">
             <h1 class="text-4xl font-bold mb-4">Confidence Ratings</h1>
-            <p class="mb-3">After each trial, you'll be asked to rate how confident you are that your response was correct.</p>
+            <p class="mb-3">After each response, you'll be asked to rate how confident you are that your response was correct.</p>
             <p class="mb-3">Use the slider to indicate your confidence level, from 50% (chance level) to 100% (completely certain).</p>
             <p class="mb-3">Try to be as accurate as possible when rating your confidence.</p>
             <div class="my-4 p-4 border rounded bg-gray-50 flex justify-center">
@@ -99,6 +112,7 @@ function createInstructions() {
         `;
 
     let intermediateInstructionPages = [
+        boxInstructionPage2,
         feedbackPageHTML,
         confidenceRatingsPageHTML,
     ];
@@ -118,10 +132,9 @@ function createInstructions() {
     const lastPageHTML = `
         <div class="max-w-4xl mx-auto text-2xl">
             <h1 class="text-4xl font-bold mb-4">Practice Trials</h1>
-            <p class="mb-3">Before we begin, you'll complete 10 practice trials to get familiar with the task.</p>
-            <p class="mb-3">The practice will show you both types of tasks - with and without feedback.</p>
+            <p class="mb-3">Before we begin, you'll complete a short practice o get familiar with the task.</p>
             <p class="mb-3">During practice, the dots will be shown for a little longer than in the real task.</p>
-            <p class="mb-3">After the practice, we'll begin the actual experiment with the first learning block.</p>
+            <p class="mb-3">After the practice, we'll begin the actual experiment.</p>
             <p class="mb-3 mt-6 text-center font-bold">Press the button below when you're ready to begin the practice trials.</p>
         </div>
     `;
@@ -129,6 +142,16 @@ function createInstructions() {
     const instructions_part1 = {
         type: jsPsychInstructions,
         pages: [page1_html],
+        show_clickable_nav: true,
+        allow_backward: false,
+        button_label_next: '<span class="text-2xl font-bold">Next</span>',
+        data: { trial_type: "instructions_part1" },
+        
+    };
+
+    const instructions_part2 = {
+        type: jsPsychInstructions,
+        pages: [boxInstructionPage2, page2_html, page3_html],
         show_clickable_nav: true,
         allow_backward: false,
         button_label_next: '<span class="text-2xl font-bold">Next</span>',
@@ -218,9 +241,10 @@ function createInstructions() {
         data: { trial_type: "instructions_canvas_example" },
     };
 
-    const instructions_part2 = {
+    const instructions_part3 = {
         type: jsPsychInstructions,
         pages: intermediateInstructionPages,
+        allow_backward: false,
         show_clickable_nav: true,
         button_label_next: '<span class="text-2xl font-bold">Next</span>',
         button_label_previous: '<span class="text-2xl font-bold">Previous</span>',
@@ -235,10 +259,10 @@ function createInstructions() {
         data: { trial_type: "instructions_final_page" },
     };
 
-    let timeline = [instructions_part1, canvas_instruction_trial];
+    let timeline = [instructions_part1, canvas_instruction_trial, instructions_part2];
 
     if (intermediateInstructionPages.length > 0) {
-        timeline.push(instructions_part2);
+        timeline.push(instructions_part3);
     }
     timeline.push(final_instruction_page_trial);
 

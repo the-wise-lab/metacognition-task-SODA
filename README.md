@@ -37,21 +37,22 @@ The task maintains **two separate staircases**:
 ### How it Works
 
 1. **Initialization**: Both staircases start at 100 dots difference
-2. **Practice trials**: Include both easy and difficult trials to initialize the staircases
-3. **Continuous adaptation**: Throughout the experiment, each trial updates the appropriate staircase based on the participant's response
+2. **Practice trials**: Include both easy and difficult trials that actively update and initialize the staircases
+3. **Continuous adaptation**: Throughout the experiment, each trial (including practice) updates the appropriate staircase based on the participant's response
 4. **State maintenance**: Staircase state is preserved across all blocks (no reset between blocks)
 5. **Data logging**: Comprehensive tracking of staircase progression, including:
    - Current dot difference for each trial
    - Running accuracy for each condition
    - Number of reversals
    - Complete value history
+6. **Console logging**: Optional real-time logging to browser console showing staircase updates (can be enabled/disabled in config)
 
 ### Theoretical Background
 
-The staircase procedure implements an **up/down method** where the ratio of up/down steps determines the target accuracy:
+The staircase procedure implements a **weighted up/down method** (Kaernbach, 1991) where the ratio of up/down steps determines the target accuracy:
 
-- **1-up-4-down** converges to ~84.1%
-- **1-up-2-down** converges to ~70.7%
+- **1-up-4-down** converges to ~79.4% 
+- **1-up-2-down** converges to ~70.7% 
 
 This approach ensures that participants perform at consistent difficulty levels while accommodating individual differences in perceptual sensitivity.
 

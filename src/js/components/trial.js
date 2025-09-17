@@ -147,6 +147,9 @@ function createDotTrial(taskParams) {
             // Generate dot coordinates
             const leftBoxDots = baseDotsPerBox + (moreSide === 0 ? dotDifference : 0);
             const rightBoxDots = baseDotsPerBox + (moreSide === 1 ? dotDifference : 0);
+            // log these numbers
+            console.log(`Left Box Dots: ${leftBoxDots}, Right Box Dots: ${rightBoxDots}, Dot Difference: ${dotDifference}`);
+            
 
             const leftDotCoords = generateDotCoordinates(leftBoxDots, gridSize);
             const rightDotCoords = generateDotCoordinates(rightBoxDots, gridSize);
@@ -170,8 +173,8 @@ function createDotTrial(taskParams) {
             more_side: moreSide,
             is_practice: isPractice,
             dot_difference: dotDifference, // Log the actual dot difference used
-            // Add staircase data (will be null for practice trials)
-            ...(isPractice ? {} : getTrialStaircaseData(isEasy))
+            // Add staircase data for all trials (practice and main)
+            ...getTrialStaircaseData(isEasy)
             // Note: No response data here
         }
     };
@@ -187,15 +190,24 @@ function createDotTrial(taskParams) {
             
             ctx.clearRect(0, 0, canvasWidth, canvasHeight);
             // Draw only the empty boxes (passing taskColor) and get dimensions
-            const { boxY, boxHeight } = drawBoxesOnly(ctx, canvasWidth, canvasHeight, taskColor); // Pass taskColor
+            const { leftBoxX, rightBoxX, boxY, boxWidth, boxHeight } = drawBoxesOnly(ctx, canvasWidth, canvasHeight, taskColor); // Pass taskColor
 
-            // Draw prompt text below the boxes on the canvas
+            // Draw response keys immediately under each box
+            const leftKey = CONFIG.task.responseKeys.left;
+            const rightKey = CONFIG.task.responseKeys.right;
+            ctx.fillStyle = '#575757ff'; // Lighter gray for key labels
+            ctx.font = '28px sans-serif';
+            ctx.textAlign = 'center';
+            const keyY = boxY + boxHeight + 35;
+            ctx.fillText(`${leftKey}`, leftBoxX + boxWidth / 2, keyY);
+            ctx.fillText(`${rightKey}`, rightBoxX + boxWidth / 2, keyY);
+
+            // Draw question text below
             ctx.fillStyle = '#374151'; // Dark gray text
             ctx.font = '24px sans-serif';
-            ctx.textAlign = 'center';
-            const promptText = `Which box had more dots? Press '${CONFIG.task.responseKeys.left}' for left, '${CONFIG.task.responseKeys.right}' for right.`;
-            const textY = boxY + boxHeight + 50; // Position text 30px below the bottom of the boxes
-            ctx.fillText(promptText, canvasWidth / 2, textY);
+            const questionText = 'Which box had more dots?';
+            const textY = keyY + 32;
+            ctx.fillText(questionText, canvasWidth / 2, textY);
         },
         choices: [CONFIG.task.responseKeys.left, CONFIG.task.responseKeys.right], // Collect response here
         prompt: '', // Remove prompt parameter, text is drawn on canvas now
@@ -219,15 +231,13 @@ function createDotTrial(taskParams) {
                 data.response_side = responseKey;
                 data.correct = responseKey === moreSide ? 1 : 0; // Compare response to the known 'moreSide'
                 
-                // Update staircase if this is not a practice trial
-                if (!isPractice) {
-                    const newDotDifference = updateStaircase(isEasy, data.correct === 1);
-                    data.new_dot_difference = newDotDifference;
-                    
-                    // Log updated staircase data
-                    const staircaseData = getTrialStaircaseData(isEasy);
-                    Object.assign(data, staircaseData);
-                }
+                // Update staircase for both practice and main trials
+                const newDotDifference = updateStaircase(isEasy, data.correct === 1);
+                data.new_dot_difference = newDotDifference;
+                
+                // Log updated staircase data
+                const staircaseData = getTrialStaircaseData(isEasy);
+                Object.assign(data, staircaseData);
             } else {
                 // Should not happen with trial_duration: null and response_ends_trial: true, but good practice
                 data.response_side = null;

@@ -15,9 +15,9 @@ const CONFIG = {
     // Task parameters
     task: {
         // Trial counts
-        learningBlockTrials: 20, // 12 per task
+        learningBlockTrials: 24, // 12 per task
         testBlockTrials: 6,
-        practiceTrialsPerTask: 2,
+        practiceTrialsPerTask: 10,
         maxConsecutiveSameTask: 3,
         skipTestBlock: true, // Set to true to skip test blocks and task choice
         
@@ -26,10 +26,10 @@ const CONFIG = {
         
         // Staircase parameters
         staircase: {
-            initialValue: 100,    // Starting dot difference
-            stepSize: 10,         // Amount to change on each adjustment
-            minValue: 20,         // Minimum dot difference
-            maxValue: 200,        // Maximum dot difference
+            initialValue: 40,    // Starting dot difference
+            stepSize: 2,         // Amount to change on each adjustment
+            minValue: 2,         // Minimum dot difference
+            maxValue: 100,        // Maximum dot difference
             logging: true,        // Enable/disable console logging of staircase updates
             easy: {
                 targetCorrectRate: 0.85,  // Target 85% accuracy
