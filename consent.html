@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Participant Information & Consent</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+  <main class="w-full max-w-3xl bg-white shadow-md rounded-lg p-6 md:p-8">
+    <header class="mb-6">
+      <h1 class="text-2xl md:text-3xl font-bold text-gray-900 text-center">Participant Information & Consent</h1>
+      <p class="text-gray-600 mt-2 text-center">Please read the information below carefully before deciding whether to take part.</p>
+    </header>
+
+    <section class="mb-6">
+      <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+        <h2 class="text-lg font-semibold text-gray-800 mb-2">About this study</h2>
+        <p class="text-gray-700 mb-3">You are invited to take part in a research study conducted online. The study involves completing a brief computer task and answering simple questions about your perceptions and confidence. Your participation will help us understand decision-making and metacognition.</p>
+
+        <h3 class="text-base font-semibold text-gray-800 mb-1">Voluntary participation</h3>
+        <p class="text-gray-700 mb-3">Your participation is entirely voluntary. You are under no obligation to take part, and you may choose not to participate by simply closing this tab.</p>
+
+  <h3 class="text-base font-semibold text-gray-800 mb-1">Right to withdraw</h3>
+  <p class="text-gray-700 mb-3">You may withdraw from the study at any time during participation without giving a reason. You may also request withdrawal of your data after participation up until the point that it is no longer practically possible (for example, after anonymisation and aggregation). If you wish to request withdrawal of your data, please message the researcher via your Prolific account.</p>
+
+        <h3 class="text-base font-semibold text-gray-800 mb-1">Confidentiality and data use</h3>
+        <p class="text-gray-700 mb-3">Your data will be stored securely and used for research purposes. Results may be published in anonymised and aggregated form, and anonymised data may be shared with other researchers to support further research. By completing and submitting the task, you agree that your anonymised data may be used for these purposes.</p>
+
+        <h3 class="text-base font-semibold text-gray-800 mb-1">Implied and explicit consent</h3>
+        <p class="text-gray-700">A written description of the research is provided above. Submission of a completed survey/task implies consent. In addition, we record explicit confirmation of informed consent via the checkboxes below. You must confirm consent to proceed.</p>
+      </div>
+    </section>
+
+    <section class="mb-6">
+      <h2 class="text-lg font-semibold text-gray-800 mb-2">Contact</h2>
+      <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+        <p class="text-gray-700 mb-2">If you have any questions about this study or your participation, you can contact us via Prolific messaging.</p>
+        <p class="text-gray-700">
+            Alternatively, you may email the researcher at:
+            <a href="mailto:toby.wise@kcl.ac.uk" class="font-mono text-gray-900 underline hover:text-indigo-600">toby.wise@kcl.ac.uk</a>
+        </p>
+      </div>
+    </section>
+
+    <form id="consentForm" class="space-y-4">
+      <fieldset class="space-y-3">
+        <legend class="sr-only">Consent statements</legend>
+
+        <label class="flex items-start gap-3">
+          <input type="checkbox" class="mt-1 h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" name="consent_read" required>
+          <span class="text-gray-800">I have read and understood the information provided and I agree to take part in this research project.</span>
+        </label>
+
+        <label class="flex items-start gap-3">
+          <input type="checkbox" class="mt-1 h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" name="consent_voluntary" required>
+          <span class="text-gray-800">I understand that participation is voluntary and I am under no obligation to take part.</span>
+        </label>
+
+        <label class="flex items-start gap-3">
+          <input type="checkbox" class="mt-1 h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" name="consent_withdraw" required>
+          <span class="text-gray-800">I understand I can withdraw from the study at any time during participation without giving a reason, and request withdrawal of my data up to the point that it is no longer practically possible.</span>
+        </label>
+
+        <label class="flex items-start gap-3">
+          <input type="checkbox" class="mt-1 h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" name="consent_age" required>
+          <span class="text-gray-800">I confirm that I am 18 years of age or older.</span>
+        </label>
+
+        <label class="flex items-start gap-3">
+          <input type="checkbox" class="mt-1 h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" name="consent_datause" required>
+          <span class="text-gray-800">I understand that my anonymised responses will be used for research purposes.</span>
+        </label>
+
+      </fieldset>
+
+      <div class="mt-6 flex flex-col sm:flex-row gap-3">
+        <button id="proceedBtn" type="submit" class="flex-1 inline-flex justify-center items-center px-4 py-2 rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+          I Consent and Wish to Proceed
+        </button>
+        <button id="declineBtn" type="button" class="inline-flex justify-center items-center px-4 py-2 rounded-md border border-gray-300 text-gray-700 bg-white hover:bg-gray-50">
+          I Do Not Consent
+        </button>
+      </div>
+
+      <p id="validationMsg" class="text-sm text-red-600 mt-2 hidden">Please tick all required boxes to proceed.</p>
+    </form>
+
+    <footer class="mt-6 text-xs text-gray-500 text-center">
+      If you do not consent, please close this page or select “I Do Not Consent”.
+    </footer>
+  </main>
+
+  <script>
+    // Capture all incoming URL parameters to forward to the next page
+    const incomingParams = new URLSearchParams(window.location.search);
+
+    const form = document.getElementById('consentForm');
+    const proceedBtn = document.getElementById('proceedBtn');
+    const declineBtn = document.getElementById('declineBtn');
+    const validationMsg = document.getElementById('validationMsg');
+
+    // Enable/disable proceed button based on required checkboxes
+    function updateProceedState() {
+      const requiredChecks = form.querySelectorAll('input[type="checkbox"][required]');
+      const allChecked = Array.from(requiredChecks).every(cb => cb.checked);
+      proceedBtn.disabled = !allChecked;
+      validationMsg.classList.toggle('hidden', allChecked);
+    }
+
+    form.addEventListener('change', updateProceedState);
+
+    // Handle consent submit
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      updateProceedState();
+      if (proceedBtn.disabled) return;
+
+      // Record explicit consent locally (optional for audit)
+      try {
+        localStorage.setItem('consent_given', JSON.stringify({
+          consent: true,
+          timestamp: new Date().toISOString()
+        }));
+      } catch {}
+
+      // Redirect to index.html with all original query parameters preserved
+      const next = new URL('index.html', window.location.origin);
+      next.search = incomingParams.toString();
+      window.location.href = next.toString();
+    });
+
+    // Handle decline
+    declineBtn.addEventListener('click', () => {
+      // If Prolific, you could optionally redirect to a return URL here.
+      alert('You have chosen not to take part. You may close this tab.');
+    });
+
+    // Initial state
+    updateProceedState();
+  </script>
+</body>
+</html>
