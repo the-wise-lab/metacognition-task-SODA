@@ -233,6 +233,16 @@ function getCurrentDotDifference(isEasy) {
     if (!staircase) {
         throw new Error("Staircases not initialized. Call initializeStaircases() first.");
     }
+    if (staircase.enableLogging) {
+        const conditionName = isEasy ? 'EASY' : 'DIFFICULT';
+        console.log(`🔍 getCurrentDotDifference called for ${conditionName} staircase:`);
+        console.log(`   - Current dot difference: ${staircase.getCurrentValue()}`);
+        console.log(`   - Total trials: ${staircase.totalTrials}`);
+        console.log(`   - Current accuracy: ${(staircase.getCurrentAccuracy() * 100).toFixed(1)}%`);
+        console.log(`   - Consecutive correct: ${staircase.consecutiveCorrect}`);
+        console.log(`   - Consecutive incorrect: ${staircase.consecutiveIncorrect}`);
+        console.log(`   - Reversals: ${staircase.reversalPoints.length}`);
+    }
     return staircase.getCurrentValue();
 }
 

@@ -51,16 +51,8 @@ function createDotTrial(taskParams) {
     
     // Determine number of dots based on difficulty using staircase
     const baseDotsPerBox = CONFIG.task.baseDotsPerBox;
-    let dotDifference;
-    
-    // Get current dot difference from staircase (or use initial value for practice)
-    if (isPractice) {
-        // For practice trials, use the initial staircase value
-        dotDifference = CONFIG.task.staircase.initialValue;
-    } else {
-        // For main trials, get current value from staircase
-        dotDifference = getCurrentDotDifference(isEasy);
-    }
+    // Compute per-trial at runtime so it updates every trial
+    let trialDotDifference = null;
     
     // Set stimulus duration based on whether this is practice
     const stimDuration = isPractice ? 
@@ -136,6 +128,12 @@ function createDotTrial(taskParams) {
     const dotDisplay = {
         type: jsPsychCanvasKeyboardResponse,
         canvas_size: [600, 1000],
+        on_start: function() {
+            // Compute the dot difference at the start of this trial
+            trialDotDifference = isPractice
+                ? CONFIG.task.staircase.initialValue
+                : getCurrentDotDifference(isEasy);
+        },
         stimulus: function(c) {
             const ctx = c.getContext('2d');
             const canvasWidth = c.width;
@@ -145,14 +143,11 @@ function createDotTrial(taskParams) {
 
             // Draw boxes (passing taskColor) and get dimensions
             const { leftBoxX, rightBoxX, boxY, boxWidth, boxHeight, gridSize } = drawBoxesOnly(ctx, canvasWidth, canvasHeight, taskColor); // Pass taskColor
-
+            // console.log(`Trial ${trialNumber} (Block ${blockNum}): Drawing dots with difference of ${trialDotDifference} (Easy: ${isEasy})`);
             // Generate dot coordinates
-            const leftBoxDots = baseDotsPerBox + (moreSide === 0 ? dotDifference : 0);
-            const rightBoxDots = baseDotsPerBox + (moreSide === 1 ? dotDifference : 0);
-            // log these numbers
-            // console.log(`Left Box Dots: ${leftBoxDots}, Right Box Dots: ${rightBoxDots}, Dot Difference: ${dotDifference}`);
+            const leftBoxDots = baseDotsPerBox + (moreSide === 0 ? trialDotDifference : 0);
+            const rightBoxDots = baseDotsPerBox + (moreSide === 1 ? trialDotDifference : 0);
             
-
             const leftDotCoords = generateDotCoordinates(leftBoxDots, gridSize);
             const rightDotCoords = generateDotCoordinates(rightBoxDots, gridSize);
 
@@ -165,20 +160,22 @@ function createDotTrial(taskParams) {
         prompt: '', // No prompt during dot display
         trial_duration: stimDuration, // Show dots for this duration
         response_ends_trial: false,
-        data: {
-            trial_component: 'dot_display', // Changed type
-            trial_number: trialNumber,  // Added logical trial number
-            block_number: blockNum, // Added blockNum
-            task_index: taskIndex,
-            task_color: taskColor,
-            is_easy: isEasy,
-            has_feedback: hasFeedback,
-            more_side: moreSide,
-            is_practice: isPractice,
-            dot_difference: dotDifference, // Log the actual dot difference used
-            // Add staircase data for all trials (practice and main)
-            ...getTrialStaircaseData(isEasy)
-            // Note: No response data here
+        data: function() {
+            return {
+                trial_component: 'dot_display',
+                trial_number: trialNumber,
+                block_number: blockNum,
+                task_index: taskIndex,
+                task_color: taskColor,
+                is_easy: isEasy,
+                has_feedback: hasFeedback,
+                more_side: moreSide,
+                is_practice: isPractice,
+                dot_difference: trialDotDifference,
+                // Add staircase data for all trials (practice and main)
+                ...getTrialStaircaseData(isEasy)
+                // Note: No response data here
+            };
         }
     };
 
