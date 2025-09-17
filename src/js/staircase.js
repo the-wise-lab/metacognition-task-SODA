@@ -1,4 +1,5 @@
-// This file implements the staircase procedure for the metacognition task
+// This file implements the staircase procedures (classic and QUEST) for the metacognition task
+import CONFIG from './config.js';
 
 /**
  * Staircase class for adaptive difficulty adjustment
@@ -185,6 +186,91 @@ let staircases = {
     difficult: null
 };
 
+// QUEST state (shared threshold posterior across both difficulty conditions)
+let quest = null;
+
+function logIf(cond, ...args) {
+    if (cond) console.log(...args);
+}
+
+function logistic(x) {
+    return 1 / (1 + Math.exp(-x));
+}
+
+function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+
+function initQuestIfNeeded(config) {
+    if (quest) return;
+    const s = config.task.staircase;
+    const minDelta = s.minValue;
+    const maxDelta = s.maxValue;
+    const alphaGrid = [];
+    for (let a = minDelta; a <= maxDelta; a += 1) alphaGrid.push(a);
+    const logPrior = new Float64Array(alphaGrid.length);
+    const priorVal = -Math.log(alphaGrid.length);
+    for (let i = 0; i < logPrior.length; i++) logPrior[i] = priorVal;
+    quest = {
+        alphaGrid,
+        logPosterior: logPrior.slice(),
+        beta: s.quest?.beta ?? 10,
+        lapse: s.quest?.lapse ?? 0.02,
+        guess: s.quest?.guess ?? 0.5,
+        minDelta,
+        maxDelta,
+        lastDelta: s.initialValue,
+    };
+}
+
+function questPosteriorNormalize(q) {
+    const lp = q.logPosterior;
+    const m = Math.max(...lp);
+    let sum = 0;
+    for (let i = 0; i < lp.length; i++) sum += Math.exp(lp[i] - m);
+    const logZ = m + Math.log(sum);
+    for (let i = 0; i < lp.length; i++) lp[i] = lp[i] - logZ;
+}
+
+function questAlphaMAP(q) {
+    let bestIdx = 0;
+    for (let i = 1; i < q.logPosterior.length; i++) if (q.logPosterior[i] > q.logPosterior[bestIdx]) bestIdx = i;
+    return q.alphaGrid[bestIdx];
+}
+
+function questEntropy(q) {
+    const p = q.logPosterior.map(v => Math.exp(v));
+    let H = 0;
+    for (let i = 0; i < p.length; i++) if (p[i] > 0) H -= p[i] * Math.log(p[i]);
+    return H;
+}
+
+function probCorrectGiven(q, delta, alpha) {
+    const t = (delta - alpha) / q.beta;
+    const s = logistic(t);
+    return q.guess + (1 - q.guess - q.lapse) * s;
+}
+
+function questSuggestDeltaForTarget(q, pTarget) {
+    const alphaHat = questAlphaMAP(q);
+    const pEff = clamp((pTarget - q.guess) / (1 - q.guess - q.lapse), 0.01, 0.99);
+    const logit = Math.log(pEff / (1 - pEff));
+    let delta = alphaHat + q.beta * logit;
+    delta = Math.round(clamp(delta, q.minDelta, q.maxDelta));
+    return delta;
+}
+
+function questUpdate(q, presentedDelta, wasCorrect) {
+    const lp = q.logPosterior;
+    for (let i = 0; i < lp.length; i++) {
+        const alpha = q.alphaGrid[i];
+        const p = probCorrectGiven(q, presentedDelta, alpha);
+        const like = wasCorrect ? p : (1 - p);
+        lp[i] += Math.log(clamp(like, 1e-6, 1 - 1e-6));
+    }
+    questPosteriorNormalize(q);
+}
+
+let questRealTrials = 0;
+
 /**
  * Initialize staircases based on config
  * @param {Object} config - Staircase configuration
@@ -195,7 +281,7 @@ function initializeStaircases(config) {
     if (enableLogging) {
         console.log('🔧 Initializing adaptive staircases...');
     }
-    
+    // Initialize classic staircases regardless; used when method === 'classic'
     staircases.easy = new Staircase(
         config.staircase.easy.targetCorrectRate,
         config.staircase.easy.nUp,
@@ -218,6 +304,12 @@ function initializeStaircases(config) {
         enableLogging
     );
     
+    // Initialize QUEST if selected
+    if ((config.task?.staircase?.method || config.staircase?.method) === 'quest') {
+        initQuestIfNeeded({ task: config.task || { staircase: config.staircase } });
+        logIf(enableLogging, '✅ QUEST initialized with alpha grid', quest?.alphaGrid?.length);
+    }
+
     if (enableLogging) {
         console.log('✅ Staircases initialized successfully');
     }
@@ -229,21 +321,30 @@ function initializeStaircases(config) {
  * @returns {number} - Current dot difference
  */
 function getCurrentDotDifference(isEasy) {
-    const staircase = isEasy ? staircases.easy : staircases.difficult;
-    if (!staircase) {
-        throw new Error("Staircases not initialized. Call initializeStaircases() first.");
+    const method = CONFIG.task?.staircase?.method || CONFIG.staircase?.method || 'classic';
+    if (method === 'quest') {
+        initQuestIfNeeded({ task: CONFIG.task || { staircase: CONFIG.staircase } });
+        const pTarget = isEasy ? (CONFIG.task.staircase.easy.targetCorrectRate) : (CONFIG.task.staircase.difficult.targetCorrectRate);
+        const delta = questSuggestDeltaForTarget(quest, pTarget);
+        quest.lastDelta = delta;
+        return delta;
+    } else {
+        const staircase = isEasy ? staircases.easy : staircases.difficult;
+        if (!staircase) {
+            throw new Error("Staircases not initialized. Call initializeStaircases() first.");
+        }
+        if (staircase.enableLogging) {
+            const conditionName = isEasy ? 'EASY' : 'DIFFICULT';
+            console.log(`🔍 getCurrentDotDifference called for ${conditionName} staircase:`);
+            console.log(`   - Current dot difference: ${staircase.getCurrentValue()}`);
+            console.log(`   - Total trials: ${staircase.totalTrials}`);
+            console.log(`   - Current accuracy: ${(staircase.getCurrentAccuracy() * 100).toFixed(1)}%`);
+            console.log(`   - Consecutive correct: ${staircase.consecutiveCorrect}`);
+            console.log(`   - Consecutive incorrect: ${staircase.consecutiveIncorrect}`);
+            console.log(`   - Reversals: ${staircase.reversalPoints.length}`);
+        }
+        return staircase.getCurrentValue();
     }
-    if (staircase.enableLogging) {
-        const conditionName = isEasy ? 'EASY' : 'DIFFICULT';
-        console.log(`🔍 getCurrentDotDifference called for ${conditionName} staircase:`);
-        console.log(`   - Current dot difference: ${staircase.getCurrentValue()}`);
-        console.log(`   - Total trials: ${staircase.totalTrials}`);
-        console.log(`   - Current accuracy: ${(staircase.getCurrentAccuracy() * 100).toFixed(1)}%`);
-        console.log(`   - Consecutive correct: ${staircase.consecutiveCorrect}`);
-        console.log(`   - Consecutive incorrect: ${staircase.consecutiveIncorrect}`);
-        console.log(`   - Reversals: ${staircase.reversalPoints.length}`);
-    }
-    return staircase.getCurrentValue();
 }
 
 /**
@@ -252,24 +353,54 @@ function getCurrentDotDifference(isEasy) {
  * @param {boolean} correct - Whether the response was correct
  * @returns {number} - New dot difference value
  */
-function updateStaircase(isEasy, correct) {
-    const staircase = isEasy ? staircases.easy : staircases.difficult;
-    if (!staircase) {
-        throw new Error("Staircases not initialized. Call initializeStaircases() first.");
+function updateStaircase(isEasy, correct, isPractice = false) {
+    const method = CONFIG.task?.staircase?.method || CONFIG.staircase?.method || 'classic';
+    if (method === 'quest') {
+        initQuestIfNeeded({ task: CONFIG.task || { staircase: CONFIG.staircase } });
+        if (quest && typeof quest.lastDelta === 'number') {
+            questUpdate(quest, quest.lastDelta, !!correct);
+            questRealTrials += 1;
+            const every = CONFIG.task?.staircase?.summaryEveryTrials ?? 0;
+            if (every && questRealTrials % every === 0) {
+                const pEasy = CONFIG.task.staircase.easy.targetCorrectRate;
+                const pHard = CONFIG.task.staircase.difficult.targetCorrectRate;
+                const de = questSuggestDeltaForTarget(quest, pEasy);
+                const dh = questSuggestDeltaForTarget(quest, pHard);
+                console.log(`QUEST summary @${questRealTrials} trials:`);
+                console.log(`  alpha_map=${questAlphaMAP(quest)}  entropy=${questEntropy(quest).toFixed(3)}`);
+                console.log(`  suggested Δ (easy=${(pEasy*100).toFixed(0)}%): ${de}, (hard=${(pHard*100).toFixed(0)}%): ${dh}`);
+            }
+        }
+        // Return the next suggested value (for logging)
+        const pTarget = isEasy ? (CONFIG.task.staircase.easy.targetCorrectRate) : (CONFIG.task.staircase.difficult.targetCorrectRate);
+        const nextDelta = questSuggestDeltaForTarget(quest, pTarget);
+        return nextDelta;
+    } else {
+        const staircase = isEasy ? staircases.easy : staircases.difficult;
+        if (!staircase) {
+            throw new Error("Staircases not initialized. Call initializeStaircases() first.");
+        }
+        
+        if (staircase.enableLogging) {
+            const conditionName = isEasy ? 'EASY' : 'DIFFICULT';
+            console.log(`\n📊 Updating ${conditionName} staircase:`);
+        }
+        
+        const newValue = staircase.addResponse(!!correct);
+        
+        const every = CONFIG.task?.staircase?.summaryEveryTrials ?? 0;
+        if (every && staircase.totalTrials % every === 0) {
+            const sum = staircase.getSummary();
+            console.log(`Classic summary @${staircase.totalTrials} trials (${isEasy ? 'easy' : 'difficult'}):`);
+            console.log(`  value=${sum.finalValue}  accuracy=${(sum.currentAccuracy*100).toFixed(1)}%  reversals=${sum.reversalCount}`);
+        }
+
+        if (staircase.enableLogging) {
+            console.log(`📈 Current state: ${staircase.totalTrials} trials, ${staircase.reversalPoints.length} reversals\n`);
+        }
+        
+        return newValue;
     }
-    
-    if (staircase.enableLogging) {
-        const conditionName = isEasy ? 'EASY' : 'DIFFICULT';
-        console.log(`\n📊 Updating ${conditionName} staircase:`);
-    }
-    
-    const newValue = staircase.addResponse(correct);
-    
-    if (staircase.enableLogging) {
-        console.log(`📈 Current state: ${staircase.totalTrials} trials, ${staircase.reversalPoints.length} reversals\n`);
-    }
-    
-    return newValue;
 }
 
 /**
@@ -289,26 +420,43 @@ function getStaircaseSummary() {
  * @returns {Object} - Current staircase state
  */
 function getTrialStaircaseData(isEasy) {
-    const staircase = isEasy ? staircases.easy : staircases.difficult;
-    if (!staircase) {
+    const method = CONFIG.task?.staircase?.method || CONFIG.staircase?.method || 'classic';
+    if (method === 'quest') {
+        initQuestIfNeeded({ task: CONFIG.task || { staircase: CONFIG.staircase } });
+        const alpha_map = questAlphaMAP(quest);
         return {
+            staircase_method: 'quest',
             staircase_difficulty: isEasy ? 'easy' : 'difficult',
-            dot_difference: null,
-            staircase_trials: 0,
-            staircase_accuracy: 0,
-            staircase_reversals: 0
+            dot_difference: quest.lastDelta,
+            alpha_map,
+            entropy: questEntropy(quest),
+            beta: quest.beta,
+            lapse: quest.lapse,
+            guess: quest.guess
+        };
+    } else {
+        const staircase = isEasy ? staircases.easy : staircases.difficult;
+        if (!staircase) {
+            return {
+                staircase_difficulty: isEasy ? 'easy' : 'difficult',
+                dot_difference: null,
+                staircase_trials: 0,
+                staircase_accuracy: 0,
+                staircase_reversals: 0
+            };
+        }
+        
+        return {
+            staircase_method: 'classic',
+            staircase_difficulty: isEasy ? 'easy' : 'difficult',
+            dot_difference: staircase.getCurrentValue(),
+            staircase_trials: staircase.totalTrials,
+            staircase_accuracy: staircase.getCurrentAccuracy(),
+            staircase_reversals: staircase.reversalPoints.length,
+            consecutive_correct: staircase.consecutiveCorrect,
+            consecutive_incorrect: staircase.consecutiveIncorrect
         };
     }
-    
-    return {
-        staircase_difficulty: isEasy ? 'easy' : 'difficult',
-        dot_difference: staircase.getCurrentValue(),
-        staircase_trials: staircase.totalTrials,
-        staircase_accuracy: staircase.getCurrentAccuracy(),
-        staircase_reversals: staircase.reversalPoints.length,
-        consecutive_correct: staircase.consecutiveCorrect,
-        consecutive_incorrect: staircase.consecutiveIncorrect
-    };
 }
 
 export { 
