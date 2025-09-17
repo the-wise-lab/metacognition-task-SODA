@@ -126,6 +126,7 @@ jsPsych.data.addProperties({
     api_port: apiPort,
     api_endpoint: apiEndpoint,
     firebase_collection: firebaseCollection,
+    task_version: "2", // Manually set task version here
 });
 
 // Make the specific jsPsych instance globally available for access within trial components
