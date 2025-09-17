@@ -38,7 +38,7 @@ let firestore = null;
 try {
     firebaseApp = initializeApp(firebaseConfig);
     firestore = getFirestore(firebaseApp);
-    console.log("Firebase initialized successfully");
+    // console.log("Firebase initialized successfully");
 } catch (error) {
     console.warn("Firebase initialization failed:", error);
     console.warn("Firebase features will be disabled");
@@ -93,9 +93,6 @@ export function saveDataToFirebase(saveData) {
         docId
     );
 
-    console.log(
-        `Attempting to save data to Firebase path: metacognition/metacognition_pilot/subjects/${docId}`
-    );
 
     if (writeMode === "overwrite") {
         // Overwrite mode: Replace entire document
@@ -110,11 +107,11 @@ export function saveDataToFirebase(saveData) {
             url: window.location.href,
         };
 
-        console.log("Data to be sent to Firebase (overwrite):", documentData);
+        // console.log("Data to be sent to Firebase (overwrite):", documentData);
 
         return setDoc(docRef, documentData)
             .then(() => {
-                console.log("Data successfully overwritten in Firebase:", docId);
+                // console.log("Data successfully overwritten in Firebase:", docId);
                 return {
                     success: true,
                     documentId: docId,
@@ -128,7 +125,7 @@ export function saveDataToFirebase(saveData) {
             });
     } else {
         // Append mode: Add new data to existing data array using arrayUnion
-        console.log("Data to be appended to Firebase:", data);
+        // console.log("Data to be appended to Firebase:", data);
 
         // First, try to update the existing document by appending to the data array
         return updateDoc(docRef, {
@@ -140,7 +137,7 @@ export function saveDataToFirebase(saveData) {
         .catch((error) => {
             // If document doesn't exist, create it with initial data
             if (error.code === 'not-found') {
-                console.log("Document doesn't exist, creating new document for append");
+                // console.log("Document doesn't exist, creating new document for append");
                 const documentData = {
                     task: taskName,
                     subjectID: subjectID,
@@ -157,7 +154,7 @@ export function saveDataToFirebase(saveData) {
             }
         })
         .then(() => {
-            console.log("Data successfully appended to Firebase:", docId);
+            // console.log("Data successfully appended to Firebase:", docId);
             return {
                 success: true,
                 documentId: docId,
@@ -192,7 +189,7 @@ export function saveDataToServer(saveData) {
     
     // Consolidate trial data if requested
     if (consolidateData && Array.isArray(data) && data.length > 0) {
-        console.log("Consolidating trial data...");
+        // console.log("Consolidating trial data...");
         processedData = consolidateTrialData(data);
         
         // Optionally include raw data as well

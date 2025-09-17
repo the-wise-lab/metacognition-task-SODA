@@ -43,11 +43,11 @@ const apiEndpoint = urlParams.get("apiEndpoint") || "/submit_data";
 const firebaseCollection = urlParams.get("firebaseCollection") || "experiment-data";
 
 // Log these
-console.log(`Subject ID: ${subjectID}`);
-console.log(`Session ID: ${sessionID}`);
-console.log(`Save Method: ${saveMethod}`);
-console.log(`Consolidate Data: ${CONFIG.data.consolidateData}`);
-console.log(`Save Raw Data: ${CONFIG.data.saveRawData}`);
+// console.log(`Subject ID: ${subjectID}`);
+// console.log(`Session ID: ${sessionID}`);
+// console.log(`Save Method: ${saveMethod}`);
+// console.log(`Consolidate Data: ${CONFIG.data.consolidateData}`);
+// console.log(`Save Raw Data: ${CONFIG.data.saveRawData}`);
 
 // --- Seed the PRNG ---
 /**
@@ -186,7 +186,7 @@ if (!skipInstructions) {
 
 // Add practice instructions and trials (skip if skip_instructions or skip_practice is present in URL)
 if (!skipInstructions && !skipPractice) {
-    console.log(timeline);
+
     validateAndPush(
         timeline,
         createPracticeInstructions(),
@@ -195,7 +195,7 @@ if (!skipInstructions && !skipPractice) {
 
     // Practice trials - alternate between easy and difficult, use both for staircase initialization
     let practiceTrialCount = 0; // Counter for practice trial numbers
-    console.log(practiceTrialCount);
+
     for (let i = 0; i < CONFIG.task.practiceTrialsPerTask; i++) {
         // Create practice trials for both easy and difficult conditions
         for (let difficulty = 0; difficulty < 2; difficulty++) {
@@ -222,8 +222,6 @@ if (!skipInstructions && !skipPractice) {
             );
         }
     }
-
-    console.log(timeline);
 
     validateAndPush(
         timeline,
@@ -607,7 +605,6 @@ timeline.forEach((trial, index) => {
     }
 });
 
-console.log(timeline);
 
 // Comment out timeline.splice(3) for complete testing
 // timeline.splice(3);

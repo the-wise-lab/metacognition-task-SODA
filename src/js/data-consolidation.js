@@ -55,7 +55,7 @@ function consolidateTrialComponents(components, trialNumber) {
     if (!components || components.length === 0) {
         return null;
     }
-    console.log(components);
+
     // Find key components
     const dotDisplay = components.find(c => c.trial_component === 'dot_display');
     const dotResponse = components.find(c => c.trial_component === 'dot_response');

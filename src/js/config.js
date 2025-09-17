@@ -15,7 +15,7 @@ const CONFIG = {
     // Task parameters
     task: {
         // Trial counts
-        learningBlockTrials: 12, // 12 per task
+        learningBlockTrials: 24, // 12 per task
         testBlockTrials: 1,  
         practiceTrialsPerTask: 5, // This is doubled - this is the number of "pairs", i.e., the two difficulty levels
         maxConsecutiveSameTask: 3,
