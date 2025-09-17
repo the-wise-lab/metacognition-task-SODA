@@ -7,7 +7,7 @@ import CONFIG from '../config.js';
  * @returns {Object} JSPsych timeline object for performance rating
  */
 function createPerformanceRating(taskInfo) {
-    const { color, type, index, blockNum } = taskInfo; // Added blockNum
+    const { color, type, index, blockNum, trialNumber } = taskInfo; // Added trialNumber
     
     return {
         type: jsPsychHtmlSliderResponse,
@@ -29,7 +29,8 @@ function createPerformanceRating(taskInfo) {
         require_movement: true,
         button_label: '<span class="text-2xl font-bold">Submit</span>',
         data: {
-            trial_type: 'performance_rating',
+            trial_component: 'performance_rating',
+            trial_number: trialNumber, // Added trial number
             block_number: blockNum, // Added blockNum
             task_color: color,
             task_type: type,

@@ -3,6 +3,7 @@
 import CONFIG from '../config.js';
 import { generateDotCoordinates, drawDots, jitterTime, hexToRgba } from '../utils.js';
 import { createConfidenceRating } from './confidence-rating.js'; // Import confidence rating
+import { getCurrentDotDifference, updateStaircase, getTrialStaircaseData } from '../staircase.js'; // Import staircase utilities
 
 /**
  * Helper function to draw a rounded rectangle with a border on canvas
@@ -44,12 +45,22 @@ function createDotTrial(taskParams) {
         hasFeedback,    // Boolean: whether to show feedback
         moreSide,       // 0 for left, 1 for right - which side has more dots
         isPractice,     // Boolean: is this a practice trial
-        blockNum        // Current block number
+        blockNum,       // Current block number
+        trialNumber     // Logical trial number (new parameter)
     } = taskParams;
     
-    // Determine number of dots based on difficulty
+    // Determine number of dots based on difficulty using staircase
     const baseDotsPerBox = CONFIG.task.baseDotsPerBox;
-    const dotDifference = isEasy ? CONFIG.task.easyDotDifference : CONFIG.task.difficultDotDifference;
+    let dotDifference;
+    
+    // Get current dot difference from staircase (or use initial value for practice)
+    if (isPractice) {
+        // For practice trials, use the initial staircase value
+        dotDifference = CONFIG.task.staircase.initialValue;
+    } else {
+        // For main trials, get current value from staircase
+        dotDifference = getCurrentDotDifference(isEasy);
+    }
     
     // Set stimulus duration based on whether this is practice
     const stimDuration = isPractice ? 
@@ -111,7 +122,8 @@ function createDotTrial(taskParams) {
         choices: "NO_KEYS",
         trial_duration: CONFIG.timing.colorCueDuration,
         data: {
-            trial_type: 'color_cue',
+            trial_component: 'color_cue',
+            trial_number: trialNumber,  // Added logical trial number
             block_number: blockNum, // Added blockNum
             task_index: taskIndex,
             task_color: taskColor,
@@ -137,6 +149,9 @@ function createDotTrial(taskParams) {
             // Generate dot coordinates
             const leftBoxDots = baseDotsPerBox + (moreSide === 0 ? dotDifference : 0);
             const rightBoxDots = baseDotsPerBox + (moreSide === 1 ? dotDifference : 0);
+            // log these numbers
+            // console.log(`Left Box Dots: ${leftBoxDots}, Right Box Dots: ${rightBoxDots}, Dot Difference: ${dotDifference}`);
+            
 
             const leftDotCoords = generateDotCoordinates(leftBoxDots, gridSize);
             const rightDotCoords = generateDotCoordinates(rightBoxDots, gridSize);
@@ -151,14 +166,18 @@ function createDotTrial(taskParams) {
         trial_duration: stimDuration, // Show dots for this duration
         response_ends_trial: false,
         data: {
-            trial_type: 'dot_display', // Changed type
+            trial_component: 'dot_display', // Changed type
+            trial_number: trialNumber,  // Added logical trial number
             block_number: blockNum, // Added blockNum
             task_index: taskIndex,
             task_color: taskColor,
             is_easy: isEasy,
             has_feedback: hasFeedback,
             more_side: moreSide,
-            is_practice: isPractice
+            is_practice: isPractice,
+            dot_difference: dotDifference, // Log the actual dot difference used
+            // Add staircase data for all trials (practice and main)
+            ...getTrialStaircaseData(isEasy)
             // Note: No response data here
         }
     };
@@ -174,22 +193,32 @@ function createDotTrial(taskParams) {
             
             ctx.clearRect(0, 0, canvasWidth, canvasHeight);
             // Draw only the empty boxes (passing taskColor) and get dimensions
-            const { boxY, boxHeight } = drawBoxesOnly(ctx, canvasWidth, canvasHeight, taskColor); // Pass taskColor
+            const { leftBoxX, rightBoxX, boxY, boxWidth, boxHeight } = drawBoxesOnly(ctx, canvasWidth, canvasHeight, taskColor); // Pass taskColor
 
-            // Draw prompt text below the boxes on the canvas
+            // Draw response keys immediately under each box
+            const leftKey = CONFIG.task.responseKeys.left;
+            const rightKey = CONFIG.task.responseKeys.right;
+            ctx.fillStyle = '#575757ff'; // Lighter gray for key labels
+            ctx.font = '28px sans-serif';
+            ctx.textAlign = 'center';
+            const keyY = boxY + boxHeight + 35;
+            ctx.fillText(`${leftKey}`, leftBoxX + boxWidth / 2, keyY);
+            ctx.fillText(`${rightKey}`, rightBoxX + boxWidth / 2, keyY);
+
+            // Draw question text below
             ctx.fillStyle = '#374151'; // Dark gray text
             ctx.font = '24px sans-serif';
-            ctx.textAlign = 'center';
-            const promptText = `Which box had more dots? Press '${CONFIG.task.responseKeys.left}' for left, '${CONFIG.task.responseKeys.right}' for right.`;
-            const textY = boxY + boxHeight + 50; // Position text 30px below the bottom of the boxes
-            ctx.fillText(promptText, canvasWidth / 2, textY);
+            const questionText = 'Which box had more dots?';
+            const textY = keyY + 32;
+            ctx.fillText(questionText, canvasWidth / 2, textY);
         },
         choices: [CONFIG.task.responseKeys.left, CONFIG.task.responseKeys.right], // Collect response here
         prompt: '', // Remove prompt parameter, text is drawn on canvas now
         trial_duration: null, // Wait indefinitely for response
         response_ends_trial: true, // End trial upon response
         data: {
-            trial_type: 'dot_response', // New type for this part
+            trial_component: 'dot_response', // New type for this part
+            trial_number: trialNumber,  // Added logical trial number
             block_number: blockNum, // Added blockNum
             // Copy relevant info needed for analysis/feedback
             task_index: taskIndex,
@@ -205,6 +234,14 @@ function createDotTrial(taskParams) {
                 const responseKey = data.response === CONFIG.task.responseKeys.left ? 0 : 1;
                 data.response_side = responseKey;
                 data.correct = responseKey === moreSide ? 1 : 0; // Compare response to the known 'moreSide'
+                
+                // Update staircase for both practice and main trials
+                const newDotDifference = updateStaircase(isEasy, data.correct === 1);
+                data.new_dot_difference = newDotDifference;
+                
+                // Log updated staircase data
+                const staircaseData = getTrialStaircaseData(isEasy);
+                Object.assign(data, staircaseData);
             } else {
                 // Should not happen with trial_duration: null and response_ends_trial: true, but good practice
                 data.response_side = null;
@@ -263,7 +300,8 @@ function createDotTrial(taskParams) {
         trial_duration: CONFIG.timing.highlightDuration, // Use config duration
         response_ends_trial: false,
         data: { // Keep data logging consistent
-            trial_type: 'highlight',
+            trial_component: 'highlight',
+            trial_number: trialNumber,  // Added logical trial number
             block_number: blockNum, // Added blockNum
             task_index: taskIndex,
             task_color: taskColor
@@ -272,7 +310,7 @@ function createDotTrial(taskParams) {
     };
     
     // Confidence Rating
-    const confidenceRating = createConfidenceRating(taskColor, blockNum); // Pass blockNum
+    const confidenceRating = createConfidenceRating(taskColor, blockNum, trialNumber); // Pass blockNum and trialNumber
 
     // Feedback display (or no feedback)
     const feedbackDisplay = {
@@ -281,7 +319,8 @@ function createDotTrial(taskParams) {
         choices: "NO_KEYS",
         trial_duration: CONFIG.timing.feedbackDuration,
         data: {
-            trial_type: 'feedback',
+            trial_component: 'feedback',
+            trial_number: trialNumber,  // Added logical trial number
             block_number: blockNum, // Added blockNum
             task_index: taskIndex,
             task_color: taskColor,
@@ -337,7 +376,8 @@ function createDotTrial(taskParams) {
             return jitterTime(CONFIG.timing.itiDuration, CONFIG.timing.itiJitter);
         },
         data: {
-            trial_type: 'iti'
+            trial_type: 'iti',
+            trial_number: trialNumber  // Added logical trial number
         }
     };
     

@@ -12,6 +12,61 @@ This is a simplified variant of the task, which follows this structure:
 
 The task differs from the original in that we ask only for global confidence ratings, rather than bonus task preference. 
 
+## Adaptive Staircase Procedure
+
+This implementation uses an adaptive staircase procedure to dynamically adjust task difficulty and maintain target accuracy levels for each participant. This ensures consistent performance levels across participants while providing personalized difficulty.
+
+### Staircase Configuration
+
+The task maintains **two separate staircases**:
+
+- **Easy condition**: Targets 85% accuracy using a 1-up-4-down procedure
+- **Difficult condition**: Targets 71% accuracy using a 1-up-2-down procedure
+
+### Parameters
+
+- **Initial dot difference**: 100 dots
+- **Step size**: 10 dots per adjustment
+- **Bounds**: 20-200 dots (minimum-maximum)
+- **Adjustment rules**:
+  - After 1 correct response → decrease difficulty (reduce dot difference)
+  - After N incorrect responses → increase difficulty (increase dot difference)
+    - N = 4 for easy condition
+    - N = 2 for difficult condition
+
+### How it Works
+
+1. **Initialization**: Both staircases start at 100 dots difference
+2. **Practice trials**: Include both easy and difficult trials that actively update and initialize the staircases
+3. **Continuous adaptation**: Throughout the experiment, each trial (including practice) updates the appropriate staircase based on the participant's response
+4. **State maintenance**: Staircase state is preserved across all blocks (no reset between blocks)
+5. **Data logging**: Comprehensive tracking of staircase progression, including:
+   - Current dot difference for each trial
+   - Running accuracy for each condition
+   - Number of reversals
+   - Complete value history
+6. **Console logging**: Optional real-time logging to browser console showing staircase updates (can be enabled/disabled in config)
+
+### Theoretical Background
+
+The staircase procedure implements a **weighted up/down method** (Kaernbach, 1991) where the ratio of up/down steps determines the target accuracy:
+
+- **1-up-4-down** converges to ~79.4% 
+- **1-up-2-down** converges to ~70.7% 
+
+This approach ensures that participants perform at consistent difficulty levels while accommodating individual differences in perceptual sensitivity.
+
+### Implementation Details
+
+The staircase implementation is contained in `src/js/staircase.js` and includes:
+
+- **`Staircase` class**: Core implementation with response tracking and difficulty adjustment
+- **Global state management**: Maintains separate easy/difficult condition staircases
+- **Integration with trials**: Automatic updating based on participant responses
+- **Comprehensive logging**: Trial-by-trial staircase state and summary statistics
+
+Configuration is handled in `src/js/config.js` under the `task.staircase` section, allowing easy adjustment of parameters for different experimental requirements.
+
 ## Running the task
 
 You can access the landing page [here](https://the-wise-lab.github.io/metacognition-task-SODA/landing.html).

@@ -15,16 +15,33 @@ const CONFIG = {
     // Task parameters
     task: {
         // Trial counts
-        learningBlockTrials: 20, // 12 per task
-        testBlockTrials: 6,
-        practiceTrialsPerTask: 2,
+        learningBlockTrials: 12, // 12 per task
+        testBlockTrials: 1,  
+        practiceTrialsPerTask: 5, // This is doubled - this is the number of "pairs", i.e., the two difficulty levels
         maxConsecutiveSameTask: 3,
         skipTestBlock: true, // Set to true to skip test blocks and task choice
         
         // Dot parameters
         baseDotsPerBox: 313, // half-filled box (out of 625 positions)
-        difficultDotDifference: 24, // +24 dots (target ~70% accuracy)
-        easyDotDifference: 58,    // +58 dots (target ~85% accuracy)
+        
+        // Staircase parameters
+        staircase: {
+            initialValue: 40,    // Starting dot difference
+            stepSize: 2,         // Amount to change on each adjustment
+            minValue: 2,         // Minimum dot difference
+            maxValue: 100,        // Maximum dot difference
+            logging: false,        // Enable/disable console logging of staircase updates
+            easy: {
+                targetCorrectRate: 0.85,  // Target 85% accuracy
+                nUp: 1,                   // 1 correct to decrease difficulty
+                nDown: 4                  // 4 incorrect to increase difficulty (1 up 4 down)
+            },
+            difficult: {
+                targetCorrectRate: 0.71,  // Target 71% accuracy
+                nUp: 1,                   // 1 correct to decrease difficulty
+                nDown: 2                  // 2 incorrect to increase difficulty (1 up 2 down)
+            }
+        },
         gridSize: 25, // 25x25 grid = 625 positions
         boxWidthPercent: 0.3, // Percentage of canvas width for each box (adjust for size)
         boxGapPercent: 0.2, // Percentage of canvas width for the gap between boxes
@@ -51,13 +68,13 @@ const CONFIG = {
         ['#0085c7', '#aa0e0e'],
         ['#00c7b0', '#aa0e88'],
         ['#1a9cff', '#fea62a'],
-        ['#b42afe', '#1affd9'], 
-        ['#432afe', '#ffd91a'], 
-        ['#fe2a90', '#4bff1a'],
-        ['#2afe9b', '#ff881a'], 
-        ['#f0ff1a', '#fe2aa6'],
-        ['#00ad1d', '#9800a3']
-    ], // Shuffling removed, will be done in main.js
+        // ['#b42afe', '#1affd9'], 
+        // ['#432afe', '#ffd91a'], 
+        // ['#fe2a90', '#4bff1a'],
+        // ['#2afe9b', '#ff881a'], 
+        // ['#f0ff1a', '#fe2aa6'],
+        // ['#00ad1d', '#9800a3']
+    ], 
     
     // Define specific colors for practice trials (used in main.js and instructions.js)
     practiceTaskColors: ['#FF69B4', '#1E90FF'], // Pink and Blue for practice
@@ -69,6 +86,16 @@ const CONFIG = {
         step: 1,
         tickMarks: [50, 60, 70, 80, 90, 100],
         tickLabels: ['50% (chance)', '', '', '', '', '100% (perfect)']
+    },
+
+    instructions: {
+        show_debrief: true
+    },
+
+    // Data saving and consolidation settings
+    data: {
+        consolidateData: true,  // Consolidate trial components into single entries
+        saveRawData: false      // Also save raw jsPsych data alongside consolidated data
     }
 };
 
