@@ -200,7 +200,7 @@ export function saveDataToServer(saveData) {
             };
         }
         
-        console.log(`Data consolidation complete: ${data.length} raw entries -> ${processedData.length || processedData.consolidated_data?.length} consolidated entries`);
+        // console.log(`Data consolidation complete: ${data.length} raw entries -> ${processedData.length || processedData.consolidated_data?.length} consolidated entries`);
     }
 
     // Route to appropriate save method

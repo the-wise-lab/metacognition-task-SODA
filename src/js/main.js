@@ -91,22 +91,29 @@ const jsPsych = initJsPsych({
     show_progress_bar: false,
     on_finish: function () {
         // Save data to server
-        const allData = jsPsych.data.get().values(); // Get as array of objects
-        saveDataToServer({
-            taskName: "metacognition-task", // Or a more dynamic task name if needed
-            subjectID: subjectID,
-            sessionID: sessionID,
-            data: allData,
-            saveMethod: saveMethod,
-            apiURL: apiURL,
-            apiPort: apiPort,
-            apiEndpoint: apiEndpoint,
-            firebaseCollection: firebaseCollection,
-            writeMode: "overwrite", // Or make this configurable
-            consolidateData: CONFIG.data.consolidateData,
-            saveRawData: CONFIG.data.saveRawData,
-        });
+        // const allData = jsPsych.data.get().values(); // Get as array of objects
+        // saveDataToServer({
+        //     taskName: "metacognition-task", // Or a more dynamic task name if needed
+        //     subjectID: subjectID,
+        //     sessionID: sessionID,
+        //     data: allData,
+        //     saveMethod: saveMethod,
+        //     apiURL: apiURL,
+        //     apiPort: apiPort,
+        //     apiEndpoint: apiEndpoint,
+        //     firebaseCollection: firebaseCollection,
+        //     writeMode: "overwrite", // Or make this configurable
+        //     consolidateData: CONFIG.data.consolidateData,
+        //     saveRawData: CONFIG.data.saveRawData,
+        // });
         // jsPsych.data.displayData(); // Uncomment to display data for debugging
+
+        // Redirect to URL
+        let redirectURL = CONFIG.instructions.redirect_url || null;
+        if (redirectURL) {
+            // Redirect to specified URL
+            window.location.href = redirectURL;
+        } 
     },
 });
 
@@ -483,7 +490,7 @@ for (let block = 0; block < numBlocksToRun; block++) {
                 .get()
                 .filter({ block_number: blockNum })
                 .values(); // Get as array of objects
-            console.log(`Data for block ${blockNum} to be saved:`, blockData);
+            // console.log(`Data for block ${blockNum} to be saved:`, blockData);
             // In a real experiment, you would send 'blockData' to a server here.
             saveDataToServer({
                 taskName: "metacognition-task",

@@ -89,7 +89,8 @@ const CONFIG = {
     },
 
     instructions: {
-        show_debrief: true
+        show_debrief: true,
+        redirect_url: 'https://app.prolific.com/submissions/complete?cc=CBST3BVG'
     },
 
     // Data saving and consolidation settings
