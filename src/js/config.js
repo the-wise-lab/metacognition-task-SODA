@@ -15,9 +15,9 @@ const CONFIG = {
     // Task parameters
     task: {
         // Trial counts
-        learningBlockTrials: 24, // 12 per task
+        learningBlockTrials: 2, // 12 per task
         testBlockTrials: 1,  
-        practiceTrialsPerTask: 5, // This is doubled - this is the number of "pairs", i.e., the two difficulty levels
+        practiceTrialsPerTask: 1, // This is doubled - this is the number of "pairs", i.e., the two difficulty levels
         maxConsecutiveSameTask: 3,
         skipTestBlock: true, // Set to true to skip test blocks and task choice
         
@@ -90,6 +90,12 @@ const CONFIG = {
 
     instructions: {
         show_debrief: true
+    },
+
+    // Data saving and consolidation settings
+    data: {
+        consolidateData: true,  // Consolidate trial components into single entries
+        saveRawData: false      // Also save raw jsPsych data alongside consolidated data
     }
 };
 

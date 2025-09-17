@@ -45,7 +45,8 @@ function createDotTrial(taskParams) {
         hasFeedback,    // Boolean: whether to show feedback
         moreSide,       // 0 for left, 1 for right - which side has more dots
         isPractice,     // Boolean: is this a practice trial
-        blockNum        // Current block number
+        blockNum,       // Current block number
+        trialNumber     // Logical trial number (new parameter)
     } = taskParams;
     
     // Determine number of dots based on difficulty using staircase
@@ -121,7 +122,8 @@ function createDotTrial(taskParams) {
         choices: "NO_KEYS",
         trial_duration: CONFIG.timing.colorCueDuration,
         data: {
-            trial_type: 'color_cue',
+            trial_component: 'color_cue',
+            trial_number: trialNumber,  // Added logical trial number
             block_number: blockNum, // Added blockNum
             task_index: taskIndex,
             task_color: taskColor,
@@ -164,7 +166,8 @@ function createDotTrial(taskParams) {
         trial_duration: stimDuration, // Show dots for this duration
         response_ends_trial: false,
         data: {
-            trial_type: 'dot_display', // Changed type
+            trial_component: 'dot_display', // Changed type
+            trial_number: trialNumber,  // Added logical trial number
             block_number: blockNum, // Added blockNum
             task_index: taskIndex,
             task_color: taskColor,
@@ -214,7 +217,8 @@ function createDotTrial(taskParams) {
         trial_duration: null, // Wait indefinitely for response
         response_ends_trial: true, // End trial upon response
         data: {
-            trial_type: 'dot_response', // New type for this part
+            trial_component: 'dot_response', // New type for this part
+            trial_number: trialNumber,  // Added logical trial number
             block_number: blockNum, // Added blockNum
             // Copy relevant info needed for analysis/feedback
             task_index: taskIndex,
@@ -296,7 +300,8 @@ function createDotTrial(taskParams) {
         trial_duration: CONFIG.timing.highlightDuration, // Use config duration
         response_ends_trial: false,
         data: { // Keep data logging consistent
-            trial_type: 'highlight',
+            trial_component: 'highlight',
+            trial_number: trialNumber,  // Added logical trial number
             block_number: blockNum, // Added blockNum
             task_index: taskIndex,
             task_color: taskColor
@@ -305,7 +310,7 @@ function createDotTrial(taskParams) {
     };
     
     // Confidence Rating
-    const confidenceRating = createConfidenceRating(taskColor, blockNum); // Pass blockNum
+    const confidenceRating = createConfidenceRating(taskColor, blockNum, trialNumber); // Pass blockNum and trialNumber
 
     // Feedback display (or no feedback)
     const feedbackDisplay = {
@@ -314,7 +319,8 @@ function createDotTrial(taskParams) {
         choices: "NO_KEYS",
         trial_duration: CONFIG.timing.feedbackDuration,
         data: {
-            trial_type: 'feedback',
+            trial_component: 'feedback',
+            trial_number: trialNumber,  // Added logical trial number
             block_number: blockNum, // Added blockNum
             task_index: taskIndex,
             task_color: taskColor,
@@ -370,7 +376,8 @@ function createDotTrial(taskParams) {
             return jitterTime(CONFIG.timing.itiDuration, CONFIG.timing.itiJitter);
         },
         data: {
-            trial_type: 'iti'
+            trial_type: 'iti',
+            trial_number: trialNumber  // Added logical trial number
         }
     };
     

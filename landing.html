@@ -43,7 +43,21 @@
             </div>
 
             <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700">Server Configuration:</label>
+                <label class="block text-sm font-medium text-gray-700">Data Storage Method:</label>
+                <div class="mt-2 space-y-2">
+                    <div class="flex items-center">
+                        <input id="saveMethod_http" name="saveMethod" type="radio" value="http" checked class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                        <label for="saveMethod_http" class="ml-2 block text-sm text-gray-900">HTTP Server</label>
+                    </div>
+                    <div class="flex items-center">
+                        <input id="saveMethod_firebase" name="saveMethod" type="radio" value="firebase" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                        <label for="saveMethod_firebase" class="ml-2 block text-sm text-gray-900">Firebase</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4" id="httpConfig">
+                <label class="block text-sm font-medium text-gray-700">HTTP Server Configuration:</label>
                 <div class="mt-2 space-y-2">
                     <div>
                         <label for="apiURL" class="block text-xs font-medium text-gray-700">API URL:</label>
@@ -60,6 +74,18 @@
                 </div>
             </div>
 
+            <div class="mb-4" id="firebaseConfig" style="display: none;">
+                <label class="block text-sm font-medium text-gray-700">Firebase Configuration:</label>
+                <div class="mt-2 space-y-2">
+                    <div class="text-xs text-gray-500 mt-1">
+                        <p><strong>Database Path:</strong> metacognition/metacognition_pilot/subjects/</p>
+                        <p><strong>Document ID:</strong> {subjectID}_{sessionID}</p>
+                        <p class="mt-2">Firebase configuration is set in server-utils.js</p>
+                        <p>See FIREBASE_SETUP.md for detailed setup instructions</p>
+                    </div>
+                </div>
+            </div>
+
             <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                 Start Experiment
             </button>
@@ -67,6 +93,22 @@
     </div>
 
     <script>
+        // Handle save method radio button changes
+        document.querySelectorAll('input[name="saveMethod"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const httpConfig = document.getElementById('httpConfig');
+                const firebaseConfig = document.getElementById('firebaseConfig');
+                
+                if (this.value === 'http') {
+                    httpConfig.style.display = 'block';
+                    firebaseConfig.style.display = 'none';
+                } else if (this.value === 'firebase') {
+                    httpConfig.style.display = 'none';
+                    firebaseConfig.style.display = 'block';
+                }
+            });
+        });
+
         document.getElementById('setupForm').addEventListener('submit', function(event) {
             event.preventDefault(); // Prevent default form submission
 
@@ -75,9 +117,18 @@
             const testMode = document.getElementById('test_mode').checked;
             const skipInstructions = document.getElementById('skip_instructions').checked;
             const skipPractice = document.getElementById('skip_practice').checked;
-            const apiURL = document.getElementById('apiURL').value;
-            const apiPort = document.getElementById('apiPort').value;
-            const apiEndpoint = document.getElementById('apiEndpoint').value;
+            
+            // Get save method
+            const saveMethod = document.querySelector('input[name="saveMethod"]:checked').value;
+            
+            // Get configuration based on save method
+            let apiURL, apiPort, apiEndpoint;
+            if (saveMethod === 'http') {
+                apiURL = document.getElementById('apiURL').value;
+                apiPort = document.getElementById('apiPort').value;
+                apiEndpoint = document.getElementById('apiEndpoint').value;
+            }
+            // Note: Firebase configuration no longer needed from form (uses fixed path structure)
 
             if (!subjectID) {
                 alert('Please enter a Subject ID.');
@@ -100,15 +151,23 @@
             if (skipPractice) {
                 params.append('skip_practice', 'true');
             }
-            if (apiURL) {
-                params.append('apiURL', apiURL);
+            
+            // Add save method
+            params.append('saveMethod', saveMethod);
+            
+            // Add configuration based on save method
+            if (saveMethod === 'http') {
+                if (apiURL) {
+                    params.append('apiURL', apiURL);
+                }
+                if (apiPort) {
+                    params.append('apiPort', apiPort);
+                }
+                if (apiEndpoint) {
+                    params.append('apiEndpoint', apiEndpoint);
+                }
             }
-            if (apiPort) {
-                params.append('apiPort', apiPort);
-            }
-            if (apiEndpoint) {
-                params.append('apiEndpoint', apiEndpoint);
-            }
+            // Note: No additional parameters needed for Firebase (uses fixed path structure)
 
             // Redirect to index.html with the constructed query parameters
             window.location.href = 'index.html?' + params.toString();

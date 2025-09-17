@@ -6,9 +6,10 @@ import CONFIG from '../config.js';
  * Create a confidence rating trial
  * @param {string} taskColor - The color associated with the task
  * @param {number} blockNum - The current block number
+ * @param {number} trialNumber - The logical trial number
  * @returns {Object} JSPsych trial object for confidence rating
  */
-function createConfidenceRating(taskColor, blockNum) {
+function createConfidenceRating(taskColor, blockNum, trialNumber) {
     return {
         type: jsPsychHtmlSliderResponse,
         stimulus: `
@@ -27,7 +28,8 @@ function createConfidenceRating(taskColor, blockNum) {
         require_movement: true,
         button_label: '<span class="text-2xl font-bold">Submit</span>',
         data: {
-            trial_type: 'confidence_rating',
+            trial_component: 'confidence_rating',
+            trial_number: trialNumber,  // Added logical trial number
             block_number: blockNum, // Added blockNum
             task_color: taskColor
         },

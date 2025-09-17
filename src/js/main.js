@@ -35,14 +35,19 @@ const testMode = urlParams.has("test_mode"); // Check for test_mode parameter
 const subjectID = urlParams.get("subjectID") || null;
 const sessionID = urlParams.get("sessionID") || null;
 
-// Capture server configuration from URL
+// Capture data saving configuration from URL
+const saveMethod = urlParams.get("saveMethod") || "http";
 const apiURL = urlParams.get("apiURL") || "127.0.0.1";
 const apiPort = urlParams.get("apiPort") || "5000";
 const apiEndpoint = urlParams.get("apiEndpoint") || "/submit_data";
+const firebaseCollection = urlParams.get("firebaseCollection") || "experiment-data";
 
 // Log these
 console.log(`Subject ID: ${subjectID}`);
 console.log(`Session ID: ${sessionID}`);
+console.log(`Save Method: ${saveMethod}`);
+console.log(`Consolidate Data: ${CONFIG.data.consolidateData}`);
+console.log(`Save Raw Data: ${CONFIG.data.saveRawData}`);
 
 // --- Seed the PRNG ---
 /**
@@ -92,10 +97,14 @@ const jsPsych = initJsPsych({
             subjectID: subjectID,
             sessionID: sessionID,
             data: allData,
+            saveMethod: saveMethod,
             apiURL: apiURL,
             apiPort: apiPort,
             apiEndpoint: apiEndpoint,
+            firebaseCollection: firebaseCollection,
             writeMode: "overwrite", // Or make this configurable
+            consolidateData: CONFIG.data.consolidateData,
+            saveRawData: CONFIG.data.saveRawData,
         });
         // jsPsych.data.displayData(); // Uncomment to display data for debugging
     },
@@ -105,9 +114,11 @@ const jsPsych = initJsPsych({
 jsPsych.data.addProperties({
     subject_id: subjectID,
     session_id: sessionID,
+    save_method: saveMethod,
     api_url: apiURL,
     api_port: apiPort,
     api_endpoint: apiEndpoint,
+    firebase_collection: firebaseCollection,
 });
 
 // Make the specific jsPsych instance globally available for access within trial components
@@ -183,6 +194,8 @@ if (!skipInstructions && !skipPractice) {
     );
 
     // Practice trials - alternate between easy and difficult, use both for staircase initialization
+    let practiceTrialCount = 0; // Counter for practice trial numbers
+    console.log(practiceTrialCount);
     for (let i = 0; i < CONFIG.task.practiceTrialsPerTask; i++) {
         // Create practice trials for both easy and difficult conditions
         for (let difficulty = 0; difficulty < 2; difficulty++) {
@@ -199,7 +212,9 @@ if (!skipInstructions && !skipPractice) {
                 moreSide: moreSide,
                 isPractice: true,
                 blockNum: 0, // Practice block number
+                trialNumber: practiceTrialCount + 1, // Add logical trial number
             });
+            practiceTrialCount++; // Increment trial counter
             validateAndPush(
                 timeline,
                 practiceTrial,
@@ -237,6 +252,9 @@ if (testMode) {
         numBlocksToRun = CONFIG.colors.length;
     }
 }
+
+// Global trial counter for logical trial numbering (continues across blocks)
+let globalTrialCounter = 0; // Start after practice trials
 
 // Learning and test blocks
 for (let block = 0; block < numBlocksToRun; block++) {
@@ -304,7 +322,9 @@ for (let block = 0; block < numBlocksToRun; block++) {
             moreSide: moreSide,
             isPractice: false,
             blockNum: blockNum, // Pass blockNum
+            trialNumber: globalTrialCounter + 1, // Add logical trial number
         });
+        globalTrialCounter++; // Increment global trial counter
 
         validateAndPush(
             learningBlockTimeline,
@@ -347,7 +367,9 @@ for (let block = 0; block < numBlocksToRun; block++) {
             type: performanceRatingTaskDescription, // Use the simplified description
             index: t,
             blockNum: blockNum, // Pass blockNum
+            trialNumber: globalTrialCounter + 1, // Add logical trial number
         });
+        globalTrialCounter++; // Increment global trial counter
         validateAndPush(
             timeline,
             performanceRating,
@@ -440,7 +462,9 @@ for (let block = 0; block < numBlocksToRun; block++) {
                         moreSide: testLocations[t],
                         isPractice: false,
                         blockNum: blockNum, // Pass blockNum
+                        trialNumber: globalTrialCounter + 1, // Add logical trial number
                     });
+                    globalTrialCounter++; // Increment global trial counter
 
                     validateAndPush(
                         this.timeline,
@@ -468,10 +492,14 @@ for (let block = 0; block < numBlocksToRun; block++) {
                 subjectID: subjectID,
                 sessionID: sessionID,
                 data: blockData,
+                saveMethod: saveMethod,
                 apiURL: apiURL,
                 apiPort: apiPort,
                 apiEndpoint: apiEndpoint,
+                firebaseCollection: firebaseCollection,
                 writeMode: "append", // Or 'overwrite' depending on desired behavior for block data
+                consolidateData: CONFIG.data.consolidateData,
+                saveRawData: CONFIG.data.saveRawData,
             });
         },
         data: {
