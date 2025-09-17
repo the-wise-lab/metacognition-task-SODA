@@ -148,7 +148,7 @@ function createDotTrial(taskParams) {
             const leftBoxDots = baseDotsPerBox + (moreSide === 0 ? dotDifference : 0);
             const rightBoxDots = baseDotsPerBox + (moreSide === 1 ? dotDifference : 0);
             // log these numbers
-            console.log(`Left Box Dots: ${leftBoxDots}, Right Box Dots: ${rightBoxDots}, Dot Difference: ${dotDifference}`);
+            // console.log(`Left Box Dots: ${leftBoxDots}, Right Box Dots: ${rightBoxDots}, Dot Difference: ${dotDifference}`);
             
 
             const leftDotCoords = generateDotCoordinates(leftBoxDots, gridSize);

@@ -362,13 +362,12 @@ function createPracticeInstructions() {
  */
 function createLearningBlockInstructions() {
     let listItemsHTML = `
-        <li class="mb-1">Each block has two tasks, indicated by different colors.</li>
         <li class="mb-1">Pay attention to how well you're performing on each task.</li>
     `;
 
     if (CONFIG.task.skipTestBlock) {
         listItemsHTML += `
-        <li class="mb-1">After each learning block, you will rate your overall performance on both tasks.</li>
+        <li class="mb-1">After each block, you will rate your overall performance on both tasks.</li>
         `;
     } else {
         listItemsHTML += `
@@ -382,7 +381,7 @@ function createLearningBlockInstructions() {
         stimulus: `
             <div class="max-w-xl mx-auto">
                 <h2 class="text-2xl font-bold mb-4">End of practice</h2>
-                <p class="mb-3">You will now begin the actual experiment with the first learning block.</p>
+                <p class="mb-3">You will now begin the real task.</p>
                 <p class="mb-3">Remember:</p>
                 <ul class="list-disc list-inside mb-3">
                     ${listItemsHTML}

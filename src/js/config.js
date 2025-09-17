@@ -16,8 +16,8 @@ const CONFIG = {
     task: {
         // Trial counts
         learningBlockTrials: 24, // 12 per task
-        testBlockTrials: 6,
-        practiceTrialsPerTask: 10,
+        testBlockTrials: 1,  
+        practiceTrialsPerTask: 5, // This is doubled - this is the number of "pairs", i.e., the two difficulty levels
         maxConsecutiveSameTask: 3,
         skipTestBlock: true, // Set to true to skip test blocks and task choice
         
@@ -30,7 +30,7 @@ const CONFIG = {
             stepSize: 2,         // Amount to change on each adjustment
             minValue: 2,         // Minimum dot difference
             maxValue: 100,        // Maximum dot difference
-            logging: true,        // Enable/disable console logging of staircase updates
+            logging: false,        // Enable/disable console logging of staircase updates
             easy: {
                 targetCorrectRate: 0.85,  // Target 85% accuracy
                 nUp: 1,                   // 1 correct to decrease difficulty
@@ -68,13 +68,13 @@ const CONFIG = {
         ['#0085c7', '#aa0e0e'],
         ['#00c7b0', '#aa0e88'],
         ['#1a9cff', '#fea62a'],
-        ['#b42afe', '#1affd9'], 
-        ['#432afe', '#ffd91a'], 
-        ['#fe2a90', '#4bff1a'],
-        ['#2afe9b', '#ff881a'], 
-        ['#f0ff1a', '#fe2aa6'],
-        ['#00ad1d', '#9800a3']
-    ], // Shuffling removed, will be done in main.js
+        // ['#b42afe', '#1affd9'], 
+        // ['#432afe', '#ffd91a'], 
+        // ['#fe2a90', '#4bff1a'],
+        // ['#2afe9b', '#ff881a'], 
+        // ['#f0ff1a', '#fe2aa6'],
+        // ['#00ad1d', '#9800a3']
+    ], 
     
     // Define specific colors for practice trials (used in main.js and instructions.js)
     practiceTaskColors: ['#FF69B4', '#1E90FF'], // Pink and Blue for practice
@@ -86,6 +86,10 @@ const CONFIG = {
         step: 1,
         tickMarks: [50, 60, 70, 80, 90, 100],
         tickLabels: ['50% (chance)', '', '', '', '', '100% (perfect)']
+    },
+
+    instructions: {
+        show_debrief: true
     }
 };
 
