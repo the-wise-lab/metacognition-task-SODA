@@ -85,7 +85,14 @@ function consolidateTrialComponents(components, trialNumber) {
         
         // Trial-specific information
         more_side: dotDisplay.more_side, // 0 = left, 1 = right (which side had more dots)
-        dot_difference: dotDisplay.dot_difference,
+    dot_difference: dotDisplay.dot_difference,
+    staircase_method: dotDisplay.staircase_method || null,
+    staircase_target_rate: dotDisplay.target_rate ?? null,
+    quest_alpha_map: dotDisplay.alpha_map ?? null,
+    quest_entropy: dotDisplay.entropy ?? null,
+    quest_beta: dotDisplay.beta ?? null,
+    quest_lapse: dotDisplay.lapse ?? null,
+    quest_guess: dotDisplay.guess ?? null,
         
         // Response data (from dot_response)
         response_key: dotResponse.response,
@@ -99,7 +106,7 @@ function consolidateTrialComponents(components, trialNumber) {
         confidence_rt: confidenceRating ? confidenceRating.rt : null,
         
         // Updated staircase values (from dot_response)
-        new_dot_difference: dotResponse.new_dot_difference,
+    new_dot_difference: dotResponse.new_dot_difference,
         
         // Timing information for the whole trial
         trial_start_time: Math.min(...components.map(c => c.time_elapsed - (c.rt || 0))),

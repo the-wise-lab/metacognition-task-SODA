@@ -233,7 +233,7 @@ function createDotTrial(taskParams) {
                 data.correct = responseKey === moreSide ? 1 : 0; // Compare response to the known 'moreSide'
                 
                 // Update staircase for both practice and main trials
-                const newDotDifference = updateStaircase(isEasy, data.correct === 1);
+                const newDotDifference = updateStaircase(isEasy, data.correct === 1, isPractice);
                 data.new_dot_difference = newDotDifference;
                 
                 // Log updated staircase data
