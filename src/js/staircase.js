@@ -357,11 +357,14 @@ function updateStaircase(isEasy, correct, isPractice = false) {
     const method = CONFIG.task?.staircase?.method || CONFIG.staircase?.method || 'classic';
     if (method === 'quest') {
         initQuestIfNeeded({ task: CONFIG.task || { staircase: CONFIG.staircase } });
+        const allowPractice = CONFIG.task?.staircase?.updateOnPractice ?? true;
         if (quest && typeof quest.lastDelta === 'number') {
-            questUpdate(quest, quest.lastDelta, !!correct);
-            questRealTrials += 1;
+            if (!isPractice || allowPractice) {
+                questUpdate(quest, quest.lastDelta, !!correct);
+                questRealTrials += 1;
+            }
             const every = CONFIG.task?.staircase?.summaryEveryTrials ?? 0;
-            if (every && questRealTrials % every === 0) {
+            if (every && questRealTrials > 0 && questRealTrials % every === 0) {
                 const pEasy = CONFIG.task.staircase.easy.targetCorrectRate;
                 const pHard = CONFIG.task.staircase.difficult.targetCorrectRate;
                 const de = questSuggestDeltaForTarget(quest, pEasy);
@@ -385,11 +388,13 @@ function updateStaircase(isEasy, correct, isPractice = false) {
             const conditionName = isEasy ? 'EASY' : 'DIFFICULT';
             console.log(`\n📊 Updating ${conditionName} staircase:`);
         }
-        
-        const newValue = staircase.addResponse(!!correct);
+        const allowPractice = CONFIG.task?.staircase?.updateOnPractice ?? true;
+        const newValue = (!isPractice || allowPractice)
+            ? staircase.addResponse(!!correct)
+            : staircase.getCurrentValue();
         
         const every = CONFIG.task?.staircase?.summaryEveryTrials ?? 0;
-        if (every && staircase.totalTrials % every === 0) {
+        if (every && staircase.totalTrials > 0 && staircase.totalTrials % every === 0) {
             const sum = staircase.getSummary();
             console.log(`Classic summary @${staircase.totalTrials} trials (${isEasy ? 'easy' : 'difficult'}):`);
             console.log(`  value=${sum.finalValue}  accuracy=${(sum.currentAccuracy*100).toFixed(1)}%  reversals=${sum.reversalCount}`);
