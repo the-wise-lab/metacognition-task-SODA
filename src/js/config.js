@@ -30,15 +30,28 @@ const CONFIG = {
             initialValue: 40, // Starting dot difference
             stepSize: 2, // Amount to change on each adjustment
             minValue: 2, // Minimum dot difference
-            maxValue: 100, // Maximum dot difference
-            logging: false, // Enable/disable console logging of staircase updates
+            maxValue: 150, // Maximum dot difference
+            logging: true, // Enable/disable console logging of staircase updates
             updateOnPractice: false, // If false, do not update staircases based on practice trials
-            summaryEveryTrials: 0, // Print a staircase summary every N real trials (0 = disable)
+            summaryEveryTrials: 1, // Print a staircase summary every N real trials (0 = disable)
             // QUEST-specific parameters
             quest: {
+                // Starting estimate for the threshold (tGuess) and its SD (tGuessSd)
+                // Increase tGuess to start easier; increase tGuessSd if uncertain
+                tGuess: 32,   // initial prior mean (dot difference)
+                tGuessSd: 8,  // initial prior SD (dot difference)
                 beta: 10, // Slope (in dot units)
                 lapse: 0.02, // Lapse rate λ
                 guess: 0.5, // Guess rate γ for 2AFC
+                // Optional per-difficulty overrides
+                easy: {
+                    tGuess: 60,
+                    tGuessSd: 10,
+                },
+                difficult: {
+                    tGuess: 30,
+                    tGuessSd: 10,
+                }
             },
             easy: {
                 targetCorrectRate: 0.9, // Target 85% accuracy

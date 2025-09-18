@@ -186,8 +186,11 @@ let staircases = {
     difficult: null
 };
 
-// QUEST state (shared threshold posterior across both difficulty conditions)
-let quest = null;
+// QUEST states (separate threshold posteriors per difficulty condition)
+let quests = {
+    easy: null,
+    difficult: null
+};
 
 function logIf(cond, ...args) {
     if (cond) console.log(...args);
@@ -199,17 +202,24 @@ function logistic(x) {
 
 function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
 
-function initQuestIfNeeded(config) {
-    if (quest) return;
-    const s = config.task.staircase;
+function buildQuestState(s, overrides) {
     const minDelta = s.minValue;
     const maxDelta = s.maxValue;
     const alphaGrid = [];
     for (let a = minDelta; a <= maxDelta; a += 1) alphaGrid.push(a);
+    const mu = (overrides?.tGuess ?? s.quest?.tGuess ?? s.initialValue);
+    const sd = Math.max(1, (overrides?.tGuessSd ?? s.quest?.tGuessSd ?? Math.max(2, Math.round((maxDelta - minDelta) / 5))));
     const logPrior = new Float64Array(alphaGrid.length);
-    const priorVal = -Math.log(alphaGrid.length);
-    for (let i = 0; i < logPrior.length; i++) logPrior[i] = priorVal;
-    quest = {
+    for (let i = 0; i < alphaGrid.length; i++) {
+        const z = (alphaGrid[i] - mu) / sd;
+        logPrior[i] = -0.5 * z * z;
+    }
+    const m = Math.max(...logPrior);
+    let sum = 0;
+    for (let i = 0; i < logPrior.length; i++) sum += Math.exp(logPrior[i] - m);
+    const logZ = m + Math.log(sum);
+    for (let i = 0; i < logPrior.length; i++) logPrior[i] -= logZ;
+    return {
         alphaGrid,
         logPosterior: logPrior.slice(),
         beta: s.quest?.beta ?? 10,
@@ -217,8 +227,19 @@ function initQuestIfNeeded(config) {
         guess: s.quest?.guess ?? 0.5,
         minDelta,
         maxDelta,
-        lastDelta: s.initialValue,
+        lastDelta: clamp(Math.round(mu), minDelta, maxDelta),
+        realTrials: 0,
     };
+}
+
+function initQuestIfNeeded(config) {
+    const s = config.task.staircase;
+    if (!quests.easy) {
+        quests.easy = buildQuestState(s, s.quest?.easy);
+    }
+    if (!quests.difficult) {
+        quests.difficult = buildQuestState(s, s.quest?.difficult);
+    }
 }
 
 function questPosteriorNormalize(q) {
@@ -269,7 +290,7 @@ function questUpdate(q, presentedDelta, wasCorrect) {
     questPosteriorNormalize(q);
 }
 
-let questRealTrials = 0;
+// maintained per quest in state as realTrials
 
 /**
  * Initialize staircases based on config
@@ -307,7 +328,9 @@ function initializeStaircases(config) {
     // Initialize QUEST if selected
     if ((config.task?.staircase?.method || config.staircase?.method) === 'quest') {
         initQuestIfNeeded({ task: config.task || { staircase: config.staircase } });
-        logIf(enableLogging, '✅ QUEST initialized with alpha grid', quest?.alphaGrid?.length);
+        const lenE = quests.easy?.alphaGrid?.length;
+        const lenD = quests.difficult?.alphaGrid?.length;
+        logIf(enableLogging, `✅ QUEST initialized (alphaGrid sizes) easy=${lenE}, difficult=${lenD}`);
     }
 
     if (enableLogging) {
@@ -324,9 +347,10 @@ function getCurrentDotDifference(isEasy) {
     const method = CONFIG.task?.staircase?.method || CONFIG.staircase?.method || 'classic';
     if (method === 'quest') {
         initQuestIfNeeded({ task: CONFIG.task || { staircase: CONFIG.staircase } });
+        const q = isEasy ? quests.easy : quests.difficult;
         const pTarget = isEasy ? (CONFIG.task.staircase.easy.targetCorrectRate) : (CONFIG.task.staircase.difficult.targetCorrectRate);
-        const delta = questSuggestDeltaForTarget(quest, pTarget);
-        quest.lastDelta = delta;
+        const delta = questSuggestDeltaForTarget(q, pTarget);
+        q.lastDelta = delta;
         return delta;
     } else {
         const staircase = isEasy ? staircases.easy : staircases.difficult;
@@ -358,25 +382,23 @@ function updateStaircase(isEasy, correct, isPractice = false) {
     if (method === 'quest') {
         initQuestIfNeeded({ task: CONFIG.task || { staircase: CONFIG.staircase } });
         const allowPractice = CONFIG.task?.staircase?.updateOnPractice ?? true;
-        if (quest && typeof quest.lastDelta === 'number') {
+        const q = isEasy ? quests.easy : quests.difficult;
+        if (q && typeof q.lastDelta === 'number') {
             if (!isPractice || allowPractice) {
-                questUpdate(quest, quest.lastDelta, !!correct);
-                questRealTrials += 1;
+                questUpdate(q, q.lastDelta, !!correct);
+                q.realTrials += 1;
             }
             const every = CONFIG.task?.staircase?.summaryEveryTrials ?? 0;
-            if (every && questRealTrials > 0 && questRealTrials % every === 0) {
-                const pEasy = CONFIG.task.staircase.easy.targetCorrectRate;
-                const pHard = CONFIG.task.staircase.difficult.targetCorrectRate;
-                const de = questSuggestDeltaForTarget(quest, pEasy);
-                const dh = questSuggestDeltaForTarget(quest, pHard);
-                console.log(`QUEST summary @${questRealTrials} trials:`);
-                console.log(`  alpha_map=${questAlphaMAP(quest)}  entropy=${questEntropy(quest).toFixed(3)}`);
-                console.log(`  suggested Δ (easy=${(pEasy*100).toFixed(0)}%): ${de}, (hard=${(pHard*100).toFixed(0)}%): ${dh}`);
+            if (every && q.realTrials > 0 && q.realTrials % every === 0) {
+                const pTarget = isEasy ? CONFIG.task.staircase.easy.targetCorrectRate : CONFIG.task.staircase.difficult.targetCorrectRate;
+                const dNext = questSuggestDeltaForTarget(q, pTarget);
+                console.log(`QUEST ${isEasy ? 'easy' : 'difficult'} summary @${q.realTrials} trials:`);
+                console.log(`  alpha_map=${questAlphaMAP(q)}  entropy=${questEntropy(q).toFixed(3)}  nextΔ≈${dNext}`);
             }
         }
         // Return the next suggested value (for logging)
         const pTarget = isEasy ? (CONFIG.task.staircase.easy.targetCorrectRate) : (CONFIG.task.staircase.difficult.targetCorrectRate);
-        const nextDelta = questSuggestDeltaForTarget(quest, pTarget);
+        const nextDelta = questSuggestDeltaForTarget(q, pTarget);
         return nextDelta;
     } else {
         const staircase = isEasy ? staircases.easy : staircases.difficult;
@@ -428,16 +450,17 @@ function getTrialStaircaseData(isEasy) {
     const method = CONFIG.task?.staircase?.method || CONFIG.staircase?.method || 'classic';
     if (method === 'quest') {
         initQuestIfNeeded({ task: CONFIG.task || { staircase: CONFIG.staircase } });
-        const alpha_map = questAlphaMAP(quest);
+        const q = isEasy ? quests.easy : quests.difficult;
+        const alpha_map = questAlphaMAP(q);
         return {
             staircase_method: 'quest',
             staircase_difficulty: isEasy ? 'easy' : 'difficult',
-            dot_difference: quest.lastDelta,
+            dot_difference: q.lastDelta,
             alpha_map,
-            entropy: questEntropy(quest),
-            beta: quest.beta,
-            lapse: quest.lapse,
-            guess: quest.guess,
+            entropy: questEntropy(q),
+            beta: q.beta,
+            lapse: q.lapse,
+            guess: q.guess,
             target_rate: isEasy ? CONFIG.task.staircase.easy.targetCorrectRate : CONFIG.task.staircase.difficult.targetCorrectRate
         };
     } else {
