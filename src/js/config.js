@@ -15,7 +15,7 @@ const CONFIG = {
     // Task parameters
     task: {
         // Trial counts
-        learningBlockTrials: 24, // 12 per task
+        learningBlockTrials: 16, // 12 per task
         testBlockTrials: 1,
         practiceTrialsPerTask: 5, // This is doubled - this is the number of "pairs", i.e., the two difficulty levels
         maxConsecutiveSameTask: 3,
@@ -32,7 +32,8 @@ const CONFIG = {
             minValue: 2, // Minimum dot difference
             maxValue: 100, // Maximum dot difference
             logging: false, // Enable/disable console logging of staircase updates
-            summaryEveryTrials: 10, // Print a staircase summary every N real trials (0 = disable)
+            updateOnPractice: false, // If false, do not update staircases based on practice trials
+            summaryEveryTrials: 0, // Print a staircase summary every N real trials (0 = disable)
             // QUEST-specific parameters
             quest: {
                 beta: 10, // Slope (in dot units)
@@ -76,10 +77,10 @@ const CONFIG = {
         ["#0085c7", "#aa0e0e"],
         ["#00c7b0", "#aa0e88"],
         ["#1a9cff", "#fea62a"],
-        // ['#b42afe', '#1affd9'],
-        // ['#432afe', '#ffd91a'],
-        // ['#fe2a90', '#4bff1a'],
-        // ['#2afe9b', '#ff881a'],
+        ['#b42afe', '#1affd9'],
+        ['#432afe', '#ffd91a'],
+        ['#fe2a90', '#4bff1a'],
+        ['#2afe9b', '#ff881a'],
         // ['#f0ff1a', '#fe2aa6'],
         // ['#00ad1d', '#9800a3']
     ],
@@ -106,6 +107,7 @@ const CONFIG = {
     data: {
         consolidateData: true, // Consolidate trial components into single entries
         saveRawData: false, // Also save raw jsPsych data alongside consolidated data
+        verboseSave: true // If true, print payload previews and progress logs when saving
     },
 };
 

@@ -13,6 +13,7 @@ import {
 
 // Import data consolidation utilities
 import { consolidateTrialData } from './data-consolidation.js';
+import CONFIG from './config.js';
 
 // Firebase configuration (replace with your actual config)
 const firebaseConfig = {
@@ -79,6 +80,7 @@ export function saveDataToFirebase(saveData) {
         // Note: firebaseCollection parameter removed - using fixed path structure
     } = saveData;
 
+    const verbose = !!(CONFIG?.data?.verboseSave);
     if (!firestore) {
         throw new Error("Firebase not initialized. Check your configuration.");
     }
@@ -93,6 +95,12 @@ export function saveDataToFirebase(saveData) {
         docId
     );
 
+
+    if (verbose) {
+        console.log(`[save/firebase] Preparing ${writeMode} to ${subjectID}_${sessionID}`);
+        const preview = Array.isArray(data) ? data.slice(0, 2) : (typeof data === 'object' ? { ...data, data: undefined } : data);
+        console.log(`[save/firebase] Payload preview:`, preview);
+    }
 
     if (writeMode === "overwrite") {
         // Overwrite mode: Replace entire document
@@ -109,9 +117,10 @@ export function saveDataToFirebase(saveData) {
 
         // console.log("Data to be sent to Firebase (overwrite):", documentData);
 
+        if (verbose) console.log(`[save/firebase] setDoc…`);
         return setDoc(docRef, documentData)
             .then(() => {
-                // console.log("Data successfully overwritten in Firebase:", docId);
+                if (verbose) console.log(`[save/firebase] setDoc OK: ${docId}`);
                 return {
                     success: true,
                     documentId: docId,
@@ -128,6 +137,7 @@ export function saveDataToFirebase(saveData) {
         // console.log("Data to be appended to Firebase:", data);
 
         // First, try to update the existing document by appending to the data array
+        if (verbose) console.log(`[save/firebase] updateDoc (arrayUnion)…`);
         return updateDoc(docRef, {
             data: arrayUnion(...data),
             timestamp: serverTimestamp(),
@@ -137,7 +147,7 @@ export function saveDataToFirebase(saveData) {
         .catch((error) => {
             // If document doesn't exist, create it with initial data
             if (error.code === 'not-found') {
-                // console.log("Document doesn't exist, creating new document for append");
+                if (verbose) console.log(`[save/firebase] doc missing → setDoc (create)`);
                 const documentData = {
                     task: taskName,
                     subjectID: subjectID,
@@ -154,7 +164,7 @@ export function saveDataToFirebase(saveData) {
             }
         })
         .then(() => {
-            // console.log("Data successfully appended to Firebase:", docId);
+            if (verbose) console.log(`[save/firebase] append OK: ${docId}`);
             return {
                 success: true,
                 documentId: docId,
@@ -185,11 +195,12 @@ export function saveDataToServer(saveData) {
         saveRawData = false, // Option to also save raw data alongside consolidated
     } = saveData;
 
+    const verbose = !!(CONFIG?.data?.verboseSave);
     let processedData = data;
     
     // Consolidate trial data if requested
     if (consolidateData && Array.isArray(data) && data.length > 0) {
-        // console.log("Consolidating trial data...");
+    if (verbose) console.log("[save] Consolidating trial data...");
         processedData = consolidateTrialData(data);
         
         // Optionally include raw data as well
@@ -200,11 +211,12 @@ export function saveDataToServer(saveData) {
             };
         }
         
-        // console.log(`Data consolidation complete: ${data.length} raw entries -> ${processedData.length || processedData.consolidated_data?.length} consolidated entries`);
+        if (verbose) console.log(`[save] Consolidation complete: ${data.length} → ${processedData.length || processedData.consolidated_data?.length}`);
     }
 
     // Route to appropriate save method
     if (saveMethod === "firebase") {
+        if (verbose) console.log(`[save] Routing to Firebase…`);
         return saveDataToFirebase({
             taskName,
             subjectID,
@@ -214,6 +226,7 @@ export function saveDataToServer(saveData) {
             // Note: firebaseCollection parameter removed - using fixed path structure
         });
     } else if (saveMethod === "http") {
+        if (verbose) console.log(`[save] Routing to HTTP…`);
         return saveDataToHTTP({
             taskName,
             subjectID,
@@ -257,14 +270,19 @@ export function saveDataToHTTP(saveData) {
         data: data, // jsPsych data is already an array of objects, so direct assignment is fine
     };
 
-    console.log("Data to be sent to server:", requestData);
+    const verbose = !!(CONFIG?.data?.verboseSave);
+    if (verbose) {
+        console.log(`[save/http] POST ${apiURL}:${apiPort}${apiEndpoint}`);
+        const preview = Array.isArray(data) ? data.slice(0, 2) : (typeof data === 'object' ? { ...data, data: undefined } : data);
+        console.log(`[save/http] Payload preview:`, preview);
+    }
 
     // Construct the complete URL
     const fullApiUrl = `http://${apiURL}${
         apiPort ? `:${apiPort}` : ""
     }${apiEndpoint}`;
 
-    console.log(`Attempting to save data to: ${fullApiUrl}`);
+    if (verbose) console.log(`Attempting to save data to: ${fullApiUrl}`);
 
     // Make the POST request to the API endpoint
     return fetch(fullApiUrl, {
@@ -286,7 +304,7 @@ export function saveDataToHTTP(saveData) {
             return response.json();
         })
         .then((responseData) => {
-            console.log("Data successfully saved to API:", responseData);
+            if (verbose) console.log("[save/http] OK:", responseData);
             return responseData;
         })
         .catch((error) => {
