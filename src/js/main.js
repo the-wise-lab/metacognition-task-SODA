@@ -409,6 +409,7 @@ for (let block = 0; block < numBlocksToRun; block++) {
             index: t,
             blockNum: blockNum, // Pass blockNum
             trialNumber: globalTrialCounter + 1, // Add logical trial number
+            hasFeedback: taskPairing[t].feedback,
         });
         globalTrialCounter++; // Increment global trial counter
         validateAndPush(

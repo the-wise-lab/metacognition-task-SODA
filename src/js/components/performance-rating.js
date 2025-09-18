@@ -7,7 +7,7 @@ import CONFIG from '../config.js';
  * @returns {Object} JSPsych timeline object for performance rating
  */
 function createPerformanceRating(taskInfo) {
-    const { color, type, index, blockNum, trialNumber } = taskInfo; // Added trialNumber
+    const { color, type, index, blockNum, trialNumber, hasFeedback } = taskInfo; // Added trialNumber and hasFeedback
     
     return {
         type: jsPsychHtmlSliderResponse,
@@ -34,7 +34,8 @@ function createPerformanceRating(taskInfo) {
             block_number: blockNum, // Added blockNum
             task_color: color,
             task_type: type,
-            task_index: index
+            task_index: index,
+            has_feedback: hasFeedback === true
         },
         on_load: function() {
             const sliderElement = document.querySelector('#jspsych-html-slider-response-response'); // Get the slider input

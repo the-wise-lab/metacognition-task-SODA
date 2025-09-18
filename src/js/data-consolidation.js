@@ -133,6 +133,7 @@ function processPerformanceRatings(performanceRatings) {
         task_color: rating.task_color,
         task_type: rating.task_type,
         task_index: rating.task_index,
+        has_feedback: rating.has_feedback ?? null,
         performance_estimate: rating.response,
         performance_rt: rating.rt,
         trial_number: rating.trial_number || null

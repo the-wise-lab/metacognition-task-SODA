@@ -31,7 +31,7 @@ const CONFIG = {
             stepSize: 2, // Amount to change on each adjustment
             minValue: 2, // Minimum dot difference
             maxValue: 150, // Maximum dot difference
-            logging: true, // Enable/disable console logging of staircase updates
+            logging: false, // Enable/disable console logging of staircase updates
             updateOnPractice: false, // If false, do not update staircases based on practice trials
             summaryEveryTrials: 1, // Print a staircase summary every N real trials (0 = disable)
             // QUEST-specific parameters
