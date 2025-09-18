@@ -45,7 +45,7 @@ const CONFIG = {
                 guess: 0.5, // Guess rate γ for 2AFC
                 // Optional per-difficulty overrides
                 easy: {
-                    tGuess: 60,
+                    tGuess: 80,
                     tGuessSd: 10,
                 },
                 difficult: {
