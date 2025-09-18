@@ -259,6 +259,30 @@ if (testMode) {
     }
 }
 
+// --- Precompute balanced feedback patterns per block using seeded RNG ---
+// We aim for approximately equal counts of: both feedback, both no-feedback, mixed
+// Patterns encoded as tuples for the two tasks in a block: [task0HasFb, task1HasFb]
+function generateBalancedFeedbackPatterns(nBlocks) {
+    const base = Math.floor(nBlocks / 3);
+    let remainder = nBlocks - 3 * base;
+    const counts = { both: base, none: base, mixed: base };
+    const keys = ['both', 'none', 'mixed'];
+    // Distribute remainder deterministically using seeded randomness via shuffleArray
+    const remOrder = shuffleArray(keys.slice());
+    for (let i = 0; i < remainder; i++) counts[remOrder[i]] += 1;
+
+    const patterns = [];
+    // Construct list by counts
+    for (let k of keys) {
+        for (let i = 0; i < counts[k]; i++) patterns.push(k);
+    }
+    // Shuffle final assignment order using seeded RNG
+    const shuffled = shuffleArray(patterns);
+    return shuffled;
+}
+
+const blockFeedbackPatterns = generateBalancedFeedbackPatterns(numBlocksToRun);
+
 // Global trial counter for logical trial numbering (continues across blocks)
 let globalTrialCounter = 0; // Start after practice trials
 
@@ -280,8 +304,19 @@ for (let block = 0; block < numBlocksToRun; block++) {
         difficulty2 = "easy";
     }
 
-    const feedback1 = true; // Use seededRandom
-    const feedback2 = true; // Use seededRandom
+    // Set feedback assignment for this block from precomputed pattern
+    const pattern = blockFeedbackPatterns[block];
+    let feedback1, feedback2;
+    if (pattern === 'both') {
+        feedback1 = true; feedback2 = true;
+    } else if (pattern === 'none') {
+        feedback1 = false; feedback2 = false;
+    } else { // 'mixed'
+        // Randomly decide orientation within the block using seeded RNG
+        const orient = seededRandom() < 0.5;
+        feedback1 = orient ? true : false;
+        feedback2 = !feedback1;
+    }
 
     const taskPairing = [
         { difficulty: difficulty1, feedback: feedback1 },

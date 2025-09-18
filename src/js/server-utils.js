@@ -98,7 +98,7 @@ export function saveDataToFirebase(saveData) {
 
     if (verbose) {
         console.log(`[save/firebase] Preparing ${writeMode} to ${subjectID}_${sessionID}`);
-        const preview = Array.isArray(data) ? data.slice(0, 2) : (typeof data === 'object' ? { ...data, data: undefined } : data);
+        const preview = Array.isArray(data) ? data : (typeof data === 'object' ? { ...data, data: undefined } : data);
         console.log(`[save/firebase] Payload preview:`, preview);
     }
 
